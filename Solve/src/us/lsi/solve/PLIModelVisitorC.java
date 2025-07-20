@@ -210,9 +210,9 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	
 	
 	@Override public Object visitUnaryOpExpr(PLIModelParser.UnaryOpExprContext ctx) { 
-		Object r = this.visit(ctx.right);	
-		Preconditions.checkArgument(AuxGrammar.isInteger(r) | AuxGrammar.isDouble(r),
-				String.format("La variable debe ser int o double"));
+		Object r = this.visit(ctx.right);
+		Preconditions.checkArgument(AuxGrammar.isInteger(r) | AuxGrammar.isDouble(r) | AuxGrammar.isBoolean(r), 
+				String.format("La expresión debe ser int, double o boolean y es %s",r.getClass().getSimpleName()));
 			switch (ctx.op.getText()) {
 			case "(int)": r = AuxGrammar.castInteger(r);break;
 			case "(double)": r = AuxGrammar.castDouble(r); break;
@@ -315,6 +315,27 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 							if (ctx.exp() == null || AuxGrammar.asBoolean(visit(ctx.exp()))) {
 								s = AuxGrammar.asString(visit(ctx.indexed_elem()));
 								r.add(s);
+							}
+						}
+					}
+				}
+			}
+			break;
+		case 5:
+			for (int i = limites.get(0).li; i < limites.get(0).ls; i++) {
+				AuxGrammar.values.put(indexNames.get(0), i);
+				for (int j = limites.get(1).li; j < limites.get(1).ls; j++) {
+					AuxGrammar.values.put(indexNames.get(1), j);
+					for (int k = limites.get(2).li; k < limites.get(2).ls; k++) {
+						AuxGrammar.values.put(indexNames.get(2), k);
+						for (int l = limites.get(3).li; l < limites.get(3).ls; l++) {
+							AuxGrammar.values.put(indexNames.get(3), l);
+							for (int p = limites.get(4).li; p < limites.get(4).ls; p++) {
+								AuxGrammar.values.put(indexNames.get(4), l);
+								if (ctx.exp() == null || AuxGrammar.asBoolean(visit(ctx.exp()))) {
+									s = AuxGrammar.asString(visit(ctx.indexed_elem()));
+									r.add(s);
+								}
 							}
 						}
 					}

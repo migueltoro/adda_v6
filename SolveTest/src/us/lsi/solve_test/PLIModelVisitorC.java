@@ -211,7 +211,9 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	
 	
 	@Override public Object visitUnaryOpExpr(PLIModelParser.UnaryOpExprContext ctx) { 
-		Object r = this.visit(ctx.right);	
+		Object r = this.visit(ctx.right);
+		System.out.println(r.toString());
+
 		Preconditions.checkArgument(AuxGrammar.isInteger(r) | AuxGrammar.isDouble(r),
 				String.format("La variable debe ser int o double"));
 			switch (ctx.op.getText()) {
@@ -250,11 +252,12 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 		return "";
 	}
 	
-	@Override public Object visitC_list(PLIModelParser.C_listContext ctx) { 
+	@Override
+	public Object visitC_list(PLIModelParser.C_listContext ctx) {
 		Integer n = ctx.indx().size();
-		List<Limits> limites = new ArrayList<>(); 
+		List<Limits> limites = new ArrayList<>();
 		List<String> indexNames = new ArrayList<>();
-		for(int i = 0;i<n;i++) {
+		for (int i = 0; i < n; i++) {
 			String name = ctx.indx(i).index_name.getText();
 			indexNames.add(name);
 			Integer li = AuxGrammar.asInteger(visit(ctx.indx(i).li));
@@ -263,40 +266,40 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 			limites.add(lm);
 		}
 		List<String> r = new ArrayList<>();
-		switch(n) {
+		switch (n) {
 		case 0:
 			String s = AuxGrammar.asString(visit(ctx.indexed_elem()));
 			r.add(s);
 			break;
-		case 1: 
-			for(int i = limites.get(0).li;i<limites.get(0).ls;i++) {
-				AuxGrammar.values.put(indexNames.get(0),i);				
-				if(ctx.exp()==null || AuxGrammar.asBoolean(visit(ctx.exp()))) {
+		case 1:
+			for (int i = limites.get(0).li; i < limites.get(0).ls; i++) {
+				AuxGrammar.values.put(indexNames.get(0), i);
+				if (ctx.exp() == null || AuxGrammar.asBoolean(visit(ctx.exp()))) {
 					s = AuxGrammar.asString(visit(ctx.indexed_elem()));
-					r.add(s);	
+					r.add(s);
 				}
 			}
 			break;
-		case 2: 
-			for(int i = limites.get(0).li;i<limites.get(0).ls;i++) {			
-				AuxGrammar.values.put(indexNames.get(0),i);
-				for(int j = limites.get(1).li;j<limites.get(1).ls;j++) {
-					AuxGrammar.values.put(indexNames.get(1),j);
-					if(ctx.exp()==null || AuxGrammar.asBoolean(visit(ctx.exp()))) {
+		case 2:
+			for (int i = limites.get(0).li; i < limites.get(0).ls; i++) {
+				AuxGrammar.values.put(indexNames.get(0), i);
+				for (int j = limites.get(1).li; j < limites.get(1).ls; j++) {
+					AuxGrammar.values.put(indexNames.get(1), j);
+					if (ctx.exp() == null || AuxGrammar.asBoolean(visit(ctx.exp()))) {
 						s = AuxGrammar.asString(visit(ctx.indexed_elem()));
 						r.add(s);
 					}
 				}
 			}
 			break;
-		case 3: 
-			for(int i = limites.get(0).li;i<limites.get(0).ls;i++) {			
-				AuxGrammar.values.put(indexNames.get(0),i);
-				for(int j = limites.get(1).li;j<limites.get(1).ls;j++) {
-					AuxGrammar.values.put(indexNames.get(1),j);
-					for(int k = limites.get(2).li;k<limites.get(2).ls;k++) {
-						AuxGrammar.values.put(indexNames.get(2),k);						
-						if(ctx.exp()==null || AuxGrammar.asBoolean(visit(ctx.exp()))) {
+		case 3:
+			for (int i = limites.get(0).li; i < limites.get(0).ls; i++) {
+				AuxGrammar.values.put(indexNames.get(0), i);
+				for (int j = limites.get(1).li; j < limites.get(1).ls; j++) {
+					AuxGrammar.values.put(indexNames.get(1), j);
+					for (int k = limites.get(2).li; k < limites.get(2).ls; k++) {
+						AuxGrammar.values.put(indexNames.get(2), k);
+						if (ctx.exp() == null || AuxGrammar.asBoolean(visit(ctx.exp()))) {
 							s = AuxGrammar.asString(visit(ctx.indexed_elem()));
 							r.add(s);
 						}
@@ -322,11 +325,32 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 				}
 			}
 			break;
-		default: 
+		case 5:
+			for (int i = limites.get(0).li; i < limites.get(0).ls; i++) {
+				AuxGrammar.values.put(indexNames.get(0), i);
+				for (int j = limites.get(1).li; j < limites.get(1).ls; j++) {
+					AuxGrammar.values.put(indexNames.get(1), j);
+					for (int k = limites.get(2).li; k < limites.get(2).ls; k++) {
+						AuxGrammar.values.put(indexNames.get(2), k);
+						for (int l = limites.get(3).li; l < limites.get(3).ls; l++) {
+							AuxGrammar.values.put(indexNames.get(3), l);
+							for (int p = limites.get(4).li; p < limites.get(4).ls; p++) {
+								AuxGrammar.values.put(indexNames.get(4), l);
+								if (ctx.exp() == null || AuxGrammar.asBoolean(visit(ctx.exp()))) {
+									s = AuxGrammar.asString(visit(ctx.indexed_elem()));
+									r.add(s);
+								}
+							}
+						}
+					}
+				}
+			}
+			break;
+		default:
 		}
 		return ListString.of(r);
 	}
-	
+
 	@Override public Object visitExps(PLIModelParser.ExpsContext ctx) { 
 		List<String> r = new ArrayList<>();
 		Integer n = ctx.exp().size();

@@ -1,0 +1,52 @@
+head section
+
+Integer getN()
+Integer getL()
+Integer getT()
+Boolean precedes(Integer i, Integer j)
+Boolean getAlpha(Integer i, Integer l)
+Boolean getGamma(Integer i, Integer t)
+Boolean getRho(Integer t, Integer l, Integer m)
+Integer getDIST(Integer t)
+Integer getTCOST(Integer i, Integer t)
+Integer getTCO2(Integer i, Integer t)
+Integer getTTIME(Integer i, Integer t)
+Integer getLCOST(Integer i, Integer l)
+Integer getLCO2(Integer i, Integer l)
+Integer getLTIME(Integer i, Integer l)
+Integer N = getN()
+Integer L = getL()
+Integer T = getT()
+
+goal section
+
+min  COST[0]
+
+constraints section
+
+COST[0] - sum(getLCOST(i,l) x[i,l], i in 0 .. N, l in 0 .. L) - sum(getTCOST(i,t) v[i,l,j,m,t], l in 0 .. L, m in 0 .. L, t in 0 .. T, i in 0 .. N, j in 0 .. N | precedes(i,j)) = 0
+  
+CO2[0] - sum(getLCO2(i,l) x[i,l], i in 0 .. N, l in 0 .. L) - sum(getTCO2(i,t) v[i,l,j,m,t], l in 0 .. L, m in 0 .. L, t in 0 .. T, i in 0 .. N, j in 0 .. N | precedes(i,j)) = 0
+
+TIME[0] - sum(getLTIME(i,l) x[i,l], i in 0 .. N, l in 0 .. L) - sum(getTTIME(i,t) v[i,l,j,m,t], l in 0 .. L, m in 0 .. L, t in 0 .. T, i in 0 .. N, j in 0 .. N | precedes(i,j)) = 0
+
+sum(x[i,l], l in 0 .. L | getAlpha(i,l)) = 1, i in 0 .. N
+sum(x[i,l], l in 0 .. L | !getAlpha(i,l)) = 0, i in 0 .. N
+
+sum(w[i,t], t in 0 .. T | getGamma(i,t)) = 1, i in 0 .. N 
+sum(w[i,t], t in 0 .. T | !getGamma(i,t)) = 0, i in 0 .. N
+
+x[i,l] + x[j,m] + w[i,t] - v[i,l,j,m,t] <= 2 , l in 0 .. L, m in 0 .. L, t in 0 .. T, i in 0 .. N, j in 0 .. N | precedes(i,j)
+v[i,l,j,m,t] <= getRho(t,l,m), l in 0 .. L, m in 0 .. L, t in 0 .. T, i in 0 .. N, j in 0 .. N | precedes(i,j)
+
+bin
+
+x[i,l], i in 0 .. N, l in 0 .. L
+w[i,t], i in 0 .. N, t in 0 .. T
+v[i,l,j,m,t], i in 0 .. N, l in 0 .. L, j in 0 .. N, m in 0 .. L, t in 0 .. T | precedes(i,j)
+
+int
+
+COST[0]
+CO2[0]
+TIME[0]
