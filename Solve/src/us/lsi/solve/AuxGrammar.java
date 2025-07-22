@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -17,9 +18,11 @@ import java.util.stream.IntStream;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import us.lsi.common.Files2;
+import us.lsi.common.List2;
 import us.lsi.common.Preconditions;
 import us.lsi.model.PLIModelLexer;
 import us.lsi.model.PLIModelParser;
@@ -29,6 +32,68 @@ public class AuxGrammar {
 
 
 	public static enum Type{INT,DOUBLE,BOOLEAN};
+	
+	public static String  lineaColumna(ParserRuleContext ctx) {
+		Integer line = ctx.getStart().getLine();
+		Integer columnStart = ctx.start.getCharPositionInLine();
+		Integer columnEnd = ctx.stop.getCharPositionInLine();
+		return String.format("Error en la línea %d, entre columnas %d-%d", line, columnStart, columnEnd);
+	}
+	
+	public static Boolean notNull(ParserRuleContext ctx, Object idx) {
+		Boolean r = true;
+		if (idx == null) {
+			AuxGrammar.nErrors= AuxGrammar.nErrors + 1;
+//			System.out.println("Error en la línea " + ctx.getStart().getLine() + " columna " + ctx.start.getCharPositionInLine() + " " + ctx.getText());
+//			System.out.println(AuxGrammar.nErrors);
+			Integer line = ctx.getStart().getLine();
+			Integer columnStart = ctx.start.getCharPositionInLine();
+			Integer columnEnd = ctx.stop.getCharPositionInLine();
+			String txt = ctx.getText();
+			AuxGrammar.errors.append(String.format("\nError en la línea %d, entre columnas %d-%d: ** %s **.\nEl valor no puede ser null",
+							line, columnStart, columnEnd, txt));
+			r = false;
+		}
+		return r;
+	}
+	
+	public static Boolean isOneOfTypes(ParserRuleContext ctx, Class<?> type, Class<?>... requiredTypes) {
+		Set<Class<?>> ts = Arrays.stream(requiredTypes).collect(Collectors.toSet());
+		Boolean r = true;
+		if (!ts.contains(type)) {
+			AuxGrammar.nErrors = AuxGrammar.nErrors + 1;
+//			System.out.println("Error en la línea " + ctx.getStart().getLine() + " columna " + ctx.start.getCharPositionInLine() + " " + ctx.getText());
+//			System.out.println(AuxGrammar.nErrors);
+			Integer line = ctx.getStart().getLine();
+			Integer columnStart = ctx.start.getCharPositionInLine();
+			Integer columnEnd = ctx.stop.getCharPositionInLine();
+			String txt = ctx.getText();
+			AuxGrammar.errors.append(String.format(
+					"\nError en la línea %d, entre columnas %d-%d: ** %s **.\nEl tipo %s no es uno de los tipos permitidos %s",
+					line, columnStart, columnEnd, txt, type.getSimpleName(),
+					Arrays.stream(requiredTypes).map(t -> t.getSimpleName()).collect(Collectors.joining(","))));
+			r = false;
+		}
+		return r;
+	}
+	
+	public static Boolean isType(ParserRuleContext ctx, Class<?> type, Class<?> requiredType) {
+		Boolean r = true;
+		if (!type.equals(type)) {
+			AuxGrammar.nErrors = AuxGrammar.nErrors + 1;
+//			System.out.println("Error en la línea " + ctx.getStart().getLine() + " columna " + ctx.start.getCharPositionInLine() + " " + ctx.getText());
+//			System.out.println(AuxGrammar.nErrors);
+			Integer line = ctx.getStart().getLine();
+			Integer columnStart = ctx.start.getCharPositionInLine();
+			Integer columnEnd = ctx.stop.getCharPositionInLine();
+			String txt = ctx.getText();
+			AuxGrammar.errors.append(String.format(
+					"\nError en la línea %d, entre columnas %d-%d: ** %s **.\nEl tipo %s no es uno de los tipos permitidos %s",
+					line, columnStart, columnEnd, txt, type.toString(), requiredType.toString()));		
+		    r = false;
+		}
+		return r;
+	}
 	
 	public static Boolean isInteger(Object d) {
 		Class<? extends Object> c = d.getClass();
@@ -320,6 +385,7 @@ public class AuxGrammar {
 		return IntStream.range(0,s.length()).boxed().allMatch(i->Character.isSpaceChar(s.charAt(i)));
 	}
 	
+	
 	public static List<String> constraints = new ArrayList<>();
 	
 	public static List<String> generalConstraints = new ArrayList<>();
@@ -339,6 +405,10 @@ public class AuxGrammar {
 	public static Integer nSemicontinous = 0;
 	
 	public static Integer nContinous = 0;
+	
+	public static Integer nErrors = 0;
+	
+	public static StringBuilder errors = new StringBuilder("\nErrores encontrados:\n");
 	
 	public static Map<String,Type> types = new HashMap<>();
 	
@@ -496,14 +566,23 @@ public class AuxGrammar {
 	
 	public static void generate(Class<?> dataClass, String model, String outFile) throws IOException {
 		AuxGrammar.dataClass = dataClass;
-	    PLIModelLexer lexer = new PLIModelLexer(CharStreams.fromFileName(model));
-	    PLIModelParser parser = new PLIModelParser(new CommonTokenStream(lexer));
-	    ParseTree tree = parser.model();
-	    String answer = asString(tree.accept(new PLIModelVisitorC()));
-	    System.out.println("\n ==================== \n"
-	    		+ "Tenga en cuenta que el formato intermedio LP no distingue entre desigualdades estrictas y no estrictas en las restricciones "
-				+ "\nPor lo que, por ejemplo, < y <= son equivalentes a <=. \n ==================== \n");
-	    Files2.toFile(answer,outFile);
+		PLIModelLexer lexer = new PLIModelLexer(CharStreams.fromFileName(model));
+		PLIModelParser parser = new PLIModelParser(new CommonTokenStream(lexer));
+		ParseTree tree = parser.model();
+		String answer = asString(tree.accept(new PLIModelVisitorC()));
+		if (AuxGrammar.nErrors > 0) {
+			AuxGrammar.errors.append("\n\n=======================\n\n");
+			AuxGrammar.errors.append(String.format("El modelo %s contiene %d errores y no se compiló correctamente.\n",model, AuxGrammar.nErrors));
+			System.out.println(AuxGrammar.errors.toString());
+			System.exit(1);
+		} else {
+			System.out.println("\n\n======================\n\n");
+			System.out.println("El modelo " + model + " fué compilado sin errores y el resultado se puso en " + outFile);
+			System.out.println("\n\n======================\n\n"
+					+ "Tenga en cuenta que el formato intermedio LP no distingue entre desigualdades estrictas y no estrictas en las restricciones "
+					+ "\nPor lo que, por ejemplo, < y <= son equivalentes a <=. \n\n======================\n\n");
+			Files2.toFile(answer, outFile);
+		}
 	}
 	
 

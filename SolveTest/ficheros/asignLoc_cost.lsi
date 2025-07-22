@@ -24,7 +24,7 @@ min  COST[0]
 
 constraints section
 
-COST[0] - sum(getLCOST(i,l) x[i,l], i in 0 .. N, l in 0 .. L) - sum(getTCOST(i,t) v[i,l,j,m,t], l in 0 .. L, m in 0 .. L, t in 0 .. T, i in 0 .. N, j in 0 .. N | precedes(i,j)) = 0
+COST[0] - sum(getLCOST(i,l) x[i,l], i in 0 .. N, l in 0 .. L | getLCOST(i,l) > 0) - sum(getTCOST(i,t) v[i,l,j,m,t], l in 0 .. L, m in 0 .. L, t in 0 .. T, i in 0 .. N, j in 0 .. N | precedes(i,j) && getTCOST(i,t) > 0) = 0
   
 CO2[0] - sum(getLCO2(i,l) x[i,l], i in 0 .. N, l in 0 .. L) - sum(getTCO2(i,t) v[i,l,j,m,t], l in 0 .. L, m in 0 .. L, t in 0 .. T, i in 0 .. N, j in 0 .. N | precedes(i,j)) = 0
 
@@ -33,7 +33,7 @@ TIME[0] - sum(getLTIME(i,l) x[i,l], i in 0 .. N, l in 0 .. L) - sum(getTTIME(i,t
 sum(x[i,l], l in 0 .. L | getAlpha(i,l)) = 1, i in 0 .. N
 sum(x[i,l], l in 0 .. L | !getAlpha(i,l)) = 0, i in 0 .. N
 
-sum(w[i,t], t in 0 .. T | getGamma(i,t)) = 1, i in 0 .. N 
+sum(w[i,t], t in 0 .. T | getGamma(i,t)) = 1, i in 0 .. N
 sum(w[i,t], t in 0 .. T | !getGamma(i,t)) = 0, i in 0 .. N
 
 x[i,l] + x[j,m] + w[i,t] - v[i,l,j,m,t] <= 2 , l in 0 .. L, m in 0 .. L, t in 0 .. T, i in 0 .. N, j in 0 .. N | precedes(i,j)

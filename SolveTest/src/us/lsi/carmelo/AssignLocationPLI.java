@@ -1,5 +1,6 @@
 package us.lsi.carmelo;
 
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -47,7 +48,12 @@ public class AssignLocationPLI {
 	public static Boolean precedes(Integer i, Integer j) {
 		return precedes[i][j];
 	}
-	
+
+	// Component i directly precedes component j
+	public static Boolean precedes(Integer i, Integer l, Integer j, Integer m, Integer t) {
+		return precedes[i][j];
+	}
+
 	// if component i could be processed at location l 
 	private static Boolean[][] alpha;
 	
@@ -72,6 +78,19 @@ public class AssignLocationPLI {
 	// only one pair of locations for each transportation technique
 	public static Boolean getRho(Integer t, Integer l, Integer m) {
 		return rho[t][l][m];
+	}
+
+	// Component i directly precedes component j
+	public static Boolean precedesAndNotGetRho(Integer i, Integer l, Integer j, Integer m, Integer t) {
+		return precedes[i][j] && !rho[t][l][m];
+	}
+
+	// if component i requires one of the feasible transportation techniques    
+	private static Boolean[] TR;
+	
+	// if component i requires one of the feasible transportation techniques     
+	public static Boolean getTR(Integer i) {
+		return TR[i];
 	}
 
 	// total distance using transportation technique t
@@ -214,13 +233,23 @@ public class AssignLocationPLI {
 			    }
 			}
 
-			List<String> rhoLines = lineas.subList(lineas.indexOf("#rho")+1, lineas.indexOf("#dist"));
+			List<String> rhoLines = lineas.subList(lineas.indexOf("#rho")+1, lineas.indexOf("#tr"));
 			for (String line : rhoLines) {
 				String[] datos = line.split("\\s+");
 				int t = Integer.parseInt(datos[0].trim())-1;
 				int l = Integer.parseInt(datos[1].trim())-1;
 				int m = Integer.parseInt(datos[2].trim())-1;
 				rho[t][l][m] = true;
+			}
+			
+			AssignLocationPLI.TR = new Boolean[N];
+
+			List<String> trLines = lineas.subList(lineas.indexOf("#tr")+1, lineas.indexOf("#dist"));
+			for (String line : trLines) {
+				String[] datos = line.split("\\s+");
+				int i = Integer.parseInt(datos[0].trim()) - 1;
+				int j = Integer.parseInt(datos[1].trim());
+				TR[i] = j==1 ? true : false;
 			}
 			
 			AssignLocationPLI.DIST = new Integer[T];
@@ -338,7 +367,7 @@ public class AssignLocationPLI {
 	
 	public static void asignLocTec_model() throws IOException {
 		AssignLocationPLI.leeFichero("ficheros/datos3comp.txt");
-		AuxGrammar.generate(AssignLocationPLI.class,"ficheros/asignLoc_cost.lsi","ficheros/asignLoc.lp");
+		AuxGrammar.generate(AssignLocationPLI.class,"ficheros/asignLoc_cost_filters.lsi","ficheros/asignLoc.lp");
 		GurobiSolution solution = GurobiLp.gurobi("ficheros/asignLoc.lp");
 		Locale.setDefault(Locale.of("en", "US"));
 		System.out.println(solution.toString((s,d)->d>0.));
@@ -347,7 +376,6 @@ public class AssignLocationPLI {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		asignLocTec_model();
+
 	}
-
-
 }

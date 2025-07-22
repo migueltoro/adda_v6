@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import us.lsi.common.Pair;
-import us.lsi.common.Preconditions;
 import us.lsi.common.String2;
 import us.lsi.model.PLIModelBaseVisitor;
 import us.lsi.model.PLIModelParser;
@@ -124,15 +123,17 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	
 	@Override public Object visitModel(PLIModelParser.ModelContext ctx) { 
 		if(ctx.head()!=null) visit(ctx.head());
-		System.out.println(AuxGrammar.functions.entrySet().stream()
-				.map(e->String.format("(%s,%s)",e.getKey(),e.getValue().toString()))
-				.collect(Collectors.joining("\n")));
+		System.out.println("\nNombre de la funcion, tipo del resultado y tipos de los parámetros:\n");
 		System.out.println(AuxGrammar.parametersType.entrySet().stream()
-				.map(e->String.format("(%s,%s)",e.getKey(),AuxGrammar.toString(e.getValue())))
-				.collect(Collectors.joining(",")));
+				.map(e->String.format("%s,%s,%s",e.getKey(),
+						AuxGrammar.resultType.get(e.getKey()).toString(),
+						AuxGrammar.toString(e.getValue())))
+				.collect(Collectors.joining("\n")));
+		System.out.println("\nValores de las constantes:\n");
 		System.out.println(AuxGrammar.values.entrySet().stream()
 				.map(e->String.format("(%s,%s)",e.getKey(),e.getValue().toString()))
-				.collect(Collectors.joining(",")));
+				.collect(Collectors.joining("\n")));
+		
 		String goal = AuxGrammar.asString(visit(ctx.goal()));
 		String constraints = String.format("\nSubject To\n\n%s\n",AuxGrammar.asString(visit(ctx.constraints())));
 		String generalConstraints = "";
@@ -165,11 +166,11 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 		Object val =  this.visit(ctx.exp());		
 		switch(type) {
 		case "Integer":
-			Preconditions.checkArgument(AuxGrammar.isInteger(val),"El resultado de la expresi�n debe ser entero");
+			AuxGrammar.isType(ctx,val.getClass(),Integer.class);
 			AuxGrammar.types.put(name,Type.INT); 
 			break;
 		case "Double": 
-			Preconditions.checkArgument(AuxGrammar.isDouble(val),"El resultado de la expresi�n debe ser double");
+			AuxGrammar.isType(ctx,val.getClass(),Double.class);
 			AuxGrammar.types.put(name,Type.DOUBLE); 
 			break;
 		}
@@ -209,18 +210,37 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 		
 	
 	
-	@Override public Object visitUnaryOpExpr(PLIModelParser.UnaryOpExprContext ctx) { 
+	@Override
+	public Object visitUnaryOpExpr(PLIModelParser.UnaryOpExprContext ctx) {
 		Object r = this.visit(ctx.right);
-		Preconditions.checkArgument(AuxGrammar.isInteger(r) | AuxGrammar.isDouble(r) | AuxGrammar.isBoolean(r), 
-				String.format("La expresión debe ser int, double o boolean y es %s",r.getClass().getSimpleName()));
-			switch (ctx.op.getText()) {
-			case "(int)": r = AuxGrammar.castInteger(r);break;
-			case "(double)": r = AuxGrammar.castDouble(r); break;
-			case "+":  break;
-			case "-": r = AuxGrammar.minus(r); break;
-			case "!": r = ! AuxGrammar.asBoolean(r); break;
-			} 
-		return r;  
+		Boolean b = null;
+		switch (ctx.op.getText()) {
+		case "(int)":
+			r = 0;
+			b = AuxGrammar.isOneOfTypes(ctx, r.getClass(), Integer.class, Double.class);
+			if(b) r = AuxGrammar.castInteger(r);
+			break;
+		case "(double)":
+			r = 0.;
+			b = AuxGrammar.isOneOfTypes(ctx.right, r.getClass(), Integer.class, Double.class);
+			r = AuxGrammar.castDouble(r);
+			break;
+		case "+":
+			r = 0;
+			b = AuxGrammar.isOneOfTypes(ctx.right, r.getClass(), Integer.class, Double.class);
+			break;
+		case "-":
+			r = 0;
+			AuxGrammar.isOneOfTypes(ctx.right, r.getClass(), Integer.class, Double.class);
+			r = AuxGrammar.minus(r);
+			break;
+		case "!":
+			r = true;
+			b = AuxGrammar.isOneOfTypes(ctx.right, r.getClass(), Boolean.class);
+			r = !AuxGrammar.asBoolean(r);
+			break;
+		}
+		return r;
 	}
 	
 	
@@ -250,6 +270,7 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	}
 	
 	@Override public Object visitC_list(PLIModelParser.C_listContext ctx) { 
+		ctx.indexed_elem().getText();
 		Integer n = ctx.indx().size();
 		List<Limits> limites = new ArrayList<>(); 
 		List<String> indexNames = new ArrayList<>();
@@ -262,6 +283,9 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 			limites.add(lm);
 		}
 		List<String> r = new ArrayList<>();
+//		System.out.println(String.format("Element %s, size %d, indices: %s, limites: %s",ctx.indexed_elem().getText(),n,indexNames,limites));
+		String err = AuxGrammar.lineaColumna(ctx);
+		assert n <= 5 : String.format("%s, el número de indices no puede ser mayor que 5 y es %d",err,n);
 		switch(n) {
 		case 0:
 			String s = AuxGrammar.asString(visit(ctx.indexed_elem()));
@@ -402,7 +426,9 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	@Override public Object visitAtomConstraint(PLIModelParser.AtomConstraintContext ctx) { 
 		String ge = AuxGrammar.asString(visit(ctx.generate_exp()));
 		String op = ctx.rel_op().getText();
-		String e = visit(ctx.exp()).toString();
+		Object aux = visit(ctx.exp());
+		String e = aux.toString();
+		AuxGrammar.isOneOfTypes(ctx.exp(),aux.getClass(),Integer.class,Double.class);
 		String r = String.format("%s %s %s",ge,op,e);
 		return r;
 	}
@@ -411,7 +437,8 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	@Override public Object visitIndicatorConstraint(PLIModelParser.IndicatorConstraintContext ctx) { 
 		String ge = AuxGrammar.asString(visit(ctx.var_id()));
 		String n = ctx.values.getText();
-		Preconditions.checkArgument(n.equals("0") | n.equals("1"),String.format("El valor debe ser 0 0 1 y es %s",n));
+		String err = AuxGrammar.lineaColumna(ctx);
+		assert n.equals("0") | n.equals("1") : String.format("%s, el valor debe ser 0 0 1 y es %s",err,n);
 		String c = AuxGrammar.asString(visit(ctx.constraint()));
 		return String.format("%s = %s -> %s",ge,n,c);
 	}
@@ -430,7 +457,8 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 
 	@Override public Object visitSumGenerateExp(PLIModelParser.SumGenerateExpContext ctx) { 
 		List<String> ls = AuxGrammar.asListString(visit(ctx.list()));
-		String r1 = ls.stream().collect(Collectors.joining(" + "));
+		String r1 = ls.stream().collect(Collectors.joining(" + "));		
+		if(ls.size()==0) r1 = "0";
 		Integer n = ctx.s_factor().size();
 		String r2 =  IntStream.range(0,n).boxed()
 				.map(i->AuxGrammar.asString(visit(ctx.s_factor(i))))
@@ -531,45 +559,110 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	}
 	
 	@Override
-	public Object visitOpExpr(PLIModelParser.OpExprContext ctx) {	
+	public Object visitOpExpr(PLIModelParser.OpExprContext ctx) {
+		
 		String op = ctx.op.getText();
 		Object left = this.visit(ctx.left);
-		Preconditions.checkNotNull(left,String.format("%s",ctx.left));
-		if(op.equals("&&") && !AuxGrammar.asBoolean(left)) return false;
-		if(op.equals("||") && AuxGrammar.asBoolean(left)) return true;
+		AuxGrammar.notNull(ctx,ctx.left);
+		if (op.equals("&&") && !AuxGrammar.asBoolean(left))
+			return false;
+		if (op.equals("||") && AuxGrammar.asBoolean(left))
+			return true;
 		Object right = this.visit(ctx.right);
-		Preconditions.checkNotNull(right,String.format("%s",ctx.right));
-		
-		Preconditions.checkArgument(
-				(AuxGrammar.isInteger(left) || AuxGrammar.isDouble(left) ||  AuxGrammar.isBoolean(left))
-						&& (AuxGrammar.isInteger(right) || AuxGrammar.isDouble(right) || AuxGrammar.isBoolean(right)),
-				String.format("Los operandos deben ser num�ricos"));
+		AuxGrammar.notNull(ctx, ctx.right);
 		Object r = null;
+		Boolean b1 = null, b2 = null;
 		switch (op) {
-		case "%": r = AuxGrammar.rest(left,right); break;
-		case "*": r = AuxGrammar.multiply(left,right); break;
-		case "/": r = AuxGrammar.div(left,right);; break;
-		case "+": r = AuxGrammar.sum(left,right);; break;
-		case "-": r = AuxGrammar.difference(left,right); break;
-		case "<=": r = AuxGrammar.le(left,right); break;
-        case "<": r = AuxGrammar.lt(left,right); break;
-        case ">=": r = AuxGrammar.ge(left,right); break;
-        case ">": r = AuxGrammar.gt(left,right); break;
-        case "=": r = AuxGrammar.eq(left,right); break;
-        case "!=": r = AuxGrammar.ne(left,right); break;
-        case "&&": r = AuxGrammar.and(left,right); break;
-        case "||": r = AuxGrammar.or(left,right); break;
-		default: Preconditions.checkArgument(false, String.format("Operator %s desconocido", op));
-		}		
+		case "%":
+			r = 0; 
+			b1 = AuxGrammar.isType(ctx.left, left.getClass(), Integer.class);
+			b2 = AuxGrammar.isType(ctx.right, right.getClass(), Integer.class);
+			if(b1 && b2) r = AuxGrammar.rest(left, right);
+			break;
+		case "*":
+			r = 0; 
+			b1 = AuxGrammar.isOneOfTypes(ctx.left, left.getClass(), Integer.class, Double.class);
+			b2 = AuxGrammar.isOneOfTypes(ctx.right, right.getClass(), Integer.class, Double.class);
+			if(b1 && b2) r = AuxGrammar.multiply(left, right);
+			break;
+		case "/":
+			r = 0; 
+			b1 = AuxGrammar.isOneOfTypes(ctx.left, left.getClass(), Integer.class, Double.class);
+			b2 = AuxGrammar.isOneOfTypes(ctx.right, right.getClass(), Integer.class, Double.class);
+			if(b1 && b2) r = AuxGrammar.div(left, right);
+			break;
+		case "+":
+			r = 0; 
+			b1 = AuxGrammar.isOneOfTypes(ctx.left, left.getClass(), Integer.class, Double.class);
+			b2 = AuxGrammar.isOneOfTypes(ctx.right, right.getClass(), Integer.class, Double.class);
+			if(b1 && b2) r = AuxGrammar.sum(left, right);
+			break;
+		case "-":
+			r = 0; 
+			b1 = AuxGrammar.isOneOfTypes(ctx.left, left.getClass(), Integer.class, Double.class);
+			b2 = AuxGrammar.isOneOfTypes(ctx.right, right.getClass(), Integer.class, Double.class);
+			if(b1 && b2) r = AuxGrammar.difference(left, right);
+			break;
+		case "<=":
+			r = true;
+			b1 = AuxGrammar.isOneOfTypes(ctx.left, left.getClass(), Integer.class, Double.class);
+			b2 = AuxGrammar.isOneOfTypes(ctx.right, right.getClass(), Integer.class, Double.class);
+			if(b1 && b2) r = AuxGrammar.le(left, right);
+			break;
+		case "<":
+			r = true;
+			b1 = AuxGrammar.isOneOfTypes(ctx.left, left.getClass(), Integer.class, Double.class);
+			b2 = AuxGrammar.isOneOfTypes(ctx.right, right.getClass(), Integer.class, Double.class);
+			if(b1 && b2) r = AuxGrammar.lt(left, right);
+			break;
+		case ">=":
+			r = true;
+			b1 = AuxGrammar.isOneOfTypes(ctx.left, left.getClass(), Integer.class, Double.class);
+			b2 = AuxGrammar.isOneOfTypes(ctx.right, right.getClass(), Integer.class, Double.class);
+			if(b1 && b2) r = AuxGrammar.ge(left, right);
+			break;
+		case ">":
+			r = true;
+			b1 = AuxGrammar.isOneOfTypes(ctx.left, left.getClass(), Integer.class, Double.class);
+			b2 = AuxGrammar.isOneOfTypes(ctx.right, right.getClass(), Integer.class, Double.class);
+			if(b1 && b2) r = AuxGrammar.gt(left, right);
+			break;
+		case "=":
+			r = true;
+			b1 = AuxGrammar.isOneOfTypes(ctx.left, left.getClass(), Integer.class, Double.class);
+			b2 = AuxGrammar.isOneOfTypes(ctx.right, right.getClass(), Integer.class, Double.class);
+			if(b1 && b2) r = AuxGrammar.eq(left, right);
+			break;
+		case "!=":
+			r = true;
+			b1 = AuxGrammar.isOneOfTypes(ctx.left, left.getClass(), Integer.class, Double.class);
+			b2 = AuxGrammar.isOneOfTypes(ctx.right, right.getClass(), Integer.class, Double.class);
+			if(b1 && b2) r = AuxGrammar.ne(left, right);
+			break;
+		case "&&":
+			b1 = AuxGrammar.isType(ctx.left, left.getClass(), Boolean.class);
+			b2 = AuxGrammar.isType(ctx.right, right.getClass(), Boolean.class);
+			if(b1 && b2) r = AuxGrammar.and(left, right);
+			break;
+		case "||":
+			r = true;
+			b1 = AuxGrammar.isType(ctx.left, left.getClass(), Boolean.class);
+			b2 = AuxGrammar.isType(ctx.right, right.getClass(), Boolean.class);
+			if(b1 && b2) r = AuxGrammar.or(left, right);
+			break;
+		default:
+			String err = AuxGrammar.lineaColumna(ctx);
+			assert false : String.format("%s, operator %s desconocido",err, op);
+		}
 		return r;
 	}
-	
 	
 	
 	@Override public Object visitOrConstraint(PLIModelParser.OrConstraintContext ctx) { 
 		Integer n = Integer.parseInt(ctx.n.getText());
 		Integer nc = ctx.constraint().size();
-		Preconditions.checkArgument(n>0 && n<nc,String.format("El parametro n no cumple las restricciones y es % d",n));
+		String err = AuxGrammar.lineaColumna(ctx);
+		assert n>0 && n<nc : String.format("%s, el parametro n no cumple las restricciones y es % d",err,n);
 		Function<Integer,String> cs = i->AuxGrammar.asString(visit(ctx.constraint(i))); 
 		List<String> lt = IntStream.range(0,nc).boxed().map(cs).collect(Collectors.toList());
 		orConstraint(ctx.rel_op().getText(),n,lt);
@@ -594,14 +687,14 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	
 	@Override public Object visitPlusSum(PLIModelParser.PlusSumContext ctx) { 
 		List<String> ls = AuxGrammar.asListString(visit(ctx.list()));
+		if(ls.size() == 0) return " + 0";
 		String r = ls.stream().collect(Collectors.joining(" + "));
 		return String.format(" + %s",r);
 	}
 	
-	
-	
 	@Override public Object visitMinusSum(PLIModelParser.MinusSumContext ctx) { 
 		List<String> ls = AuxGrammar.asListString(visit(ctx.list()));
+		if(ls.size() == 0) return " - 0";
 		String r = ls.stream().collect(Collectors.joining(" - "));
 		return String.format(" - %s",r);
 	}
@@ -618,8 +711,9 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	}
 	
 	@Override public Object visitIdExpr(PLIModelParser.IdExprContext ctx) {
-		Preconditions.checkArgument(AuxGrammar.values.keySet().contains(ctx.getText()), 
-				String.format("Variable no declarada %s",ctx.getText()));
+		String err = AuxGrammar.lineaColumna(ctx);
+		assert AuxGrammar.values.keySet().contains(ctx.getText()) : 
+				String.format("%s, variable no declarada %s",err,ctx.getText());
 	    return AuxGrammar.values.get(ctx.getText());
 	}
 	
@@ -729,8 +823,9 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 		Integer nValues = values.size();
 		Integer k = AuxGrammar.nDBinarys;
 		Integer r = AuxGrammar.nFrees;
-		Preconditions.checkArgument(nVars<=nValues,
-				String.format("El numero de variables debe ser menor o igual al de valores y son nVars=%d, nValues=%d",nVars,nValues));		
+		String err = AuxGrammar.lineaColumna(ctx);
+		assert nVars<=nValues :
+				String.format("%s, el numero de variables debe ser menor o igual al de valores y son nVars=%d, nValues=%d",err,nVars,nValues);		
 		for(int i = 0; i<nVars;i++) {
 			Pair<String,Integer> p = reorderGenExp(vars.get(i));
 			String v = negative(p.first());
@@ -774,8 +869,9 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 		List<String>  right = AuxGrammar.asListString(visit(ctx.right));
 		Integer n = left.size();
 		Integer m = right.size();
-		Preconditions.checkArgument(n == m, 
-				String.format("La parte derecha e izquierda deben ser del mismo tama�o y sus tama�o es left =%d, right=%d", n,m));
+		String err = AuxGrammar.lineaColumna(ctx);
+		assert n == m : 
+				String.format("%s, la parte derecha e izquierda deben ser del mismo tamaño y sus tamaño es left =%d, right=%d",err, n,m);
 		for (int i = 0; i < n; i++) {
 			Pair<String, Integer> pLeft = reorderGenExp(left.get(i));
 			Pair<String, Integer> pRight = reorderGenExp(right.get(i));
