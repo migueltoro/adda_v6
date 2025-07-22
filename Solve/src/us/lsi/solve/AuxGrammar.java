@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,8 +23,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import us.lsi.common.Files2;
-import us.lsi.common.List2;
 import us.lsi.common.Preconditions;
+import us.lsi.common.Trio;
 import us.lsi.model.PLIModelLexer;
 import us.lsi.model.PLIModelParser;
 
@@ -43,15 +44,19 @@ public class AuxGrammar {
 	public static Boolean notNull(ParserRuleContext ctx, Object idx) {
 		Boolean r = true;
 		if (idx == null) {
-			AuxGrammar.nErrors= AuxGrammar.nErrors + 1;
 //			System.out.println("Error en la línea " + ctx.getStart().getLine() + " columna " + ctx.start.getCharPositionInLine() + " " + ctx.getText());
 //			System.out.println(AuxGrammar.nErrors);
 			Integer line = ctx.getStart().getLine();
 			Integer columnStart = ctx.start.getCharPositionInLine();
 			Integer columnEnd = ctx.stop.getCharPositionInLine();
 			String txt = ctx.getText();
-			AuxGrammar.errors.append(String.format("\nError en la línea %d, entre columnas %d-%d: ** %s **.\nEl valor no puede ser null",
+			Trio<Integer,Integer,Integer> t = Trio.of(line,columnStart,columnEnd);	
+			if (!AuxGrammar.previousErrors.contains(t)) {
+				AuxGrammar.previousErrors.add(t);
+				AuxGrammar.nErrors = AuxGrammar.nErrors + 1;
+				AuxGrammar.errors.append(String.format("\nError en la línea %d, entre columnas %d-%d: ** %s **.\nEl valor no puede ser null",
 							line, columnStart, columnEnd, txt));
+			}
 			r = false;
 		}
 		return r;
@@ -61,17 +66,21 @@ public class AuxGrammar {
 		Set<Class<?>> ts = Arrays.stream(requiredTypes).collect(Collectors.toSet());
 		Boolean r = true;
 		if (!ts.contains(type)) {
-			AuxGrammar.nErrors = AuxGrammar.nErrors + 1;
 //			System.out.println("Error en la línea " + ctx.getStart().getLine() + " columna " + ctx.start.getCharPositionInLine() + " " + ctx.getText());
 //			System.out.println(AuxGrammar.nErrors);
 			Integer line = ctx.getStart().getLine();
 			Integer columnStart = ctx.start.getCharPositionInLine();
 			Integer columnEnd = ctx.stop.getCharPositionInLine();
 			String txt = ctx.getText();
-			AuxGrammar.errors.append(String.format(
+			Trio<Integer,Integer,Integer> tr = Trio.of(line,columnStart,columnEnd);	
+			if (!AuxGrammar.previousErrors.contains(tr)) {
+				AuxGrammar.previousErrors.add(tr);
+				AuxGrammar.nErrors = AuxGrammar.nErrors + 1;
+				AuxGrammar.errors.append(String.format(
 					"\nError en la línea %d, entre columnas %d-%d: ** %s **.\nEl tipo %s no es uno de los tipos permitidos %s",
 					line, columnStart, columnEnd, txt, type.getSimpleName(),
 					Arrays.stream(requiredTypes).map(t -> t.getSimpleName()).collect(Collectors.joining(","))));
+			}
 			r = false;
 		}
 		return r;
@@ -87,10 +96,15 @@ public class AuxGrammar {
 			Integer columnStart = ctx.start.getCharPositionInLine();
 			Integer columnEnd = ctx.stop.getCharPositionInLine();
 			String txt = ctx.getText();
-			AuxGrammar.errors.append(String.format(
+			Trio<Integer,Integer,Integer> tr = Trio.of(line,columnStart,columnEnd);	
+			if (!AuxGrammar.previousErrors.contains(tr)) {
+				AuxGrammar.previousErrors.add(tr);
+				AuxGrammar.nErrors = AuxGrammar.nErrors + 1;
+				AuxGrammar.errors.append(String.format(
 					"\nError en la línea %d, entre columnas %d-%d: ** %s **.\nEl tipo %s no es uno de los tipos permitidos %s",
 					line, columnStart, columnEnd, txt, type.toString(), requiredType.toString()));		
-		    r = false;
+			}
+			r = false;
 		}
 		return r;
 	}
@@ -409,6 +423,8 @@ public class AuxGrammar {
 	public static Integer nErrors = 0;
 	
 	public static StringBuilder errors = new StringBuilder("\nErrores encontrados:\n");
+	
+	public static Set<Trio<Integer,Integer,Integer>> previousErrors = new HashSet<>();
 	
 	public static Map<String,Type> types = new HashMap<>();
 	

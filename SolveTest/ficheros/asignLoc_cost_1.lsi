@@ -24,7 +24,7 @@ min  COST[0]
 
 constraints section
 
-COST[0] - sum(getLCOST(i,l) x[i,l], i in 0 .. N, l in 0 .. L | getLCOST(i, l) > 0) - sum(getTCOST(i,t) v[i,l,j,m,t], l in 0 .. L, m in 0 .. L, t in 0 .. T, i in 0 .. N, j in 0 .. N | precedes(i,j)) = 0
+COST[0] - sum(getLCOST(i,l) x[i,l], i in 0 .. N, l in 0 .. L | getGamma(0, 0) > 0) - sum(getTCOST(i,t) v[i,l,j,m,t], l in 0 .. L, m in 0 .. L, t in 0 .. T, i in 0 .. N, j in 0 .. N | precedes(i,j)) = 0
 TIME[0] = getAlpha(0, 0)
 
 bin

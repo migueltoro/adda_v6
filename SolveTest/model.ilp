@@ -3,6 +3,8 @@
 Minimize
  
 Subject To
- f2: = 1
+ e0: 0 = 0
+ f2: 0 = 1
 Bounds
+ 0 free
 End
