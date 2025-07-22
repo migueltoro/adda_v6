@@ -4,6 +4,7 @@ package us.lsi.pli.mochila;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import us.lsi.gurobi.GurobiLp;
 import us.lsi.gurobi.GurobiSolution;
@@ -38,10 +39,14 @@ public class MochilaPLI {
 		objetos = DatosMochila.getObjetos();
 		n = objetos.size();
 		AuxGrammar.generate(MochilaPLI.class,"modelos/mochila.lsi","ficheros/mochila.lp");
-		GurobiSolution solution = GurobiLp.gurobi("ficheros/mochila.lp");
-		Locale.setDefault(Locale.of("en", "US"));
-		System.out.println(solution.toString((s,d)->d>0.));
-		System.out.println(objetos);
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/mochila.lp");
+		if (solution.isPresent()) {
+			Locale.setDefault(Locale.of("en", "US"));
+			System.out.println(solution.get().toString((s,d)->d>0.));
+			System.out.println(objetos);
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 	
 	public static void main(String[] args) throws IOException {	

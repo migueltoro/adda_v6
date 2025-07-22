@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import us.lsi.common.Files2;
@@ -69,8 +70,12 @@ public class ProjectsData {
 		data("data/projects.txt");
 		Locale.setDefault(Locale.of("en", "US"));
 		AuxGrammar.generate(ProjectsData.class,"models/projects.lsi","ficheros/proyects.lp");
-		GurobiSolution solution = GurobiLp.gurobi("ficheros/proyects.lp");
-		System.out.println(solution.toString((s,d)-> d>0.));
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/proyects.lp");
+		if (solution.isPresent()) {
+			System.out.println(solution.get().toString((s,d)-> d>0.));
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 	
 	public static void main(String[] args) throws IOException  {	

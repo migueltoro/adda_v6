@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -64,10 +65,11 @@ public class SudokuPLI {
 		System.out.println(SolucionSudoku.of(SudokuVertexI.first()));
 		include(txt,"modelos/sudoku_p.lsi","modelos/sudoku.lsi");
 		AuxGrammar.generate(SudokuPLI.class, "modelos/sudoku.lsi", "ficheros/sudoku.lp");
-		GurobiSolution st = GurobiLp.gurobi("ficheros/sudoku.lp");
-		Locale.setDefault(Locale.of("en", "US"));
-		List<Casilla> lc = solucion(st);
-		Collections.sort(lc,Comparator.comparing(c->c.p()));	
+		Optional<GurobiSolution> st = GurobiLp.gurobi("ficheros/sudoku.lp");
+		if (st.isPresent()) {
+			Locale.setDefault(Locale.of("en", "US"));
+			List<Casilla> lc = solucion(st.get());
+			Collections.sort(lc,Comparator.comparing(c->c.p()));	
 		
 		System.out.println(SudokuVertexI.first());
 		Collections.sort(DatosSudoku.casillas,Comparator.comparing(c->c.p()));	
@@ -77,6 +79,9 @@ public class SudokuPLI {
 		}
 		System.out.println(SolucionSudoku.of(SudokuVertexI.first()));
 		System.out.println(SudokuVertexI.first());
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 	
 	

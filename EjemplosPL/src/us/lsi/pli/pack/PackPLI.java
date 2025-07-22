@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import us.lsi.common.Files2;
@@ -44,11 +45,15 @@ public class PackPLI {
 	}
 	
 	public static void pack_model() throws IOException {
-		PackPLI.data("data/pack.txt",12,18);
-		AuxGrammar.generate(PackPLI.class,"modelos/pack.lsi","ficheros/pack.lp");
-		GurobiSolution solution = GurobiLp.gurobi("ficheros/pack.lp");
-		Locale.setDefault(Locale.of("en", "US"));
-		System.out.println(solution.toString((s,d)->d>0.));
+		PackPLI.data("data/pack.txt", 12, 18);
+		AuxGrammar.generate(PackPLI.class, "modelos/pack.lsi", "ficheros/pack.lp");
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/pack.lp");
+		if (solution.isPresent()) {
+			Locale.setDefault(Locale.of("en", "US"));
+			System.out.println(solution.get().toString((s, d) -> d > 0.));
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 
 	public static void main(String[] args) throws IOException {

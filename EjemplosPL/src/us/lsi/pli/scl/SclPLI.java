@@ -2,6 +2,7 @@ package us.lsi.pli.scl;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -40,10 +41,13 @@ public class SclPLI {
 		T2 = C2.length();
 		
 		AuxGrammar.generate(SclPLI.class, "modelos/scl.lsi", "ficheros/scl.lp");
-		GurobiSolution sol= GurobiLp.gurobi("ficheros/scl.lp");
-		System.out.println(sol.toString((k,v)->v > 0.));
-		
-		printSolucion(sol);
+		Optional<GurobiSolution> sol= GurobiLp.gurobi("ficheros/scl.lp");
+		if (sol.isPresent()) {
+			System.out.println(sol.get().toString((k,v)->v > 0.));		
+			printSolucion(sol.get());
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 		
 	}
 	private static void printSolucion(GurobiSolution sol) {

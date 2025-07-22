@@ -3,6 +3,7 @@ package us.lsi.pli.asignacion;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import us.lsi.common.Files2;
 import us.lsi.gurobi.GurobiLp;
@@ -45,9 +46,13 @@ public class AsignacionPLI {
 	public static void asignacion_model() throws IOException {
 		AsignacionPLI.leeFichero("data/asignacionDeTareas_2.txt");
 		AuxGrammar.generate(AsignacionPLI.class,"modelos/asignacion.lsi","ficheros/asignacion.lp");
-		GurobiSolution solution = GurobiLp.gurobi("ficheros/asignacion.lp");
-		Locale.setDefault(Locale.of("en", "US"));
-		System.out.println(solution.toString((s,d)->d>0.));
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/asignacion.lp");
+		if (solution.isPresent()) {
+			Locale.setDefault(Locale.of("en", "US"));
+			System.out.println(solution.get().toString((s,d)->d>0.));
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 
 

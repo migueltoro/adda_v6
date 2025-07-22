@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import us.lsi.common.Files2;
 import us.lsi.gurobi.GurobiLp;
@@ -61,9 +62,14 @@ public class AcademiaPLI {
 	   
 		AuxGrammar.generate(DatosAlumno.class, "modelos/academia.lsi", "ficheros/academia.lp");
 		
-		Locale.setDefault(Locale.of("en", "US"));
-		GurobiSolution solution = GurobiLp.gurobi("ficheros/academia.lp");
-		System.out.println(solution.toString((s, d) -> d > 0.));
+		
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/academia.lp");
+		if (solution.isPresent()) {
+			Locale.setDefault(Locale.of("en", "US"));
+			System.out.println(solution.get().toString((s, d) -> d > 0.));
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 	
 	public static void academia2 () throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {

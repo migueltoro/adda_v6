@@ -3,6 +3,7 @@ package us.lsi.gurobi;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /* Copyright 2020, Gurobi Optimization, LLC */
@@ -20,25 +21,30 @@ public class GurobiLp {
 //	public static void main(String[] args) {
 	
 	public static void solve(String file) {
-		Locale.setDefault(new Locale("en", "US"));
-		GurobiSolution solution = GurobiLp.gurobi(file);
+		Locale.setDefault(Locale.of("en", "US"));
+		Optional<GurobiSolution> solution = GurobiLp.gurobi(file);
+		if (!solution.isPresent()) {
+			System.out.println("Error in solving the model.");
+			return;
+		}
+		GurobiSolution s = solution.get();
 		System.out.println("\n\n\n\n");
-		System.out.println(String.format("Objetivo : %.2f",solution.objVal));
+		System.out.println(String.format("Objetivo : %.2f",s.objVal));
 		System.out.println("\n\n");
-		System.out.println(solution.values.keySet()
+		System.out.println(s.values.keySet()
 				.stream()
-				.filter(e->solution.values.get(e)>0.)
-				.map(e->String.format("%s == %.1f",e,solution.values.get(e)))
+				.filter(e->s.values.get(e)>0.)
+				.map(e->String.format("%s == %.1f",e,s.values.get(e)))
 				.collect(Collectors.joining("\n")));
 	}
 	
 	public static GurobiSolution solveSolution(String file) {
-		Locale.setDefault(new Locale("en", "US"));
-		GurobiSolution solution = GurobiLp.gurobi(file);
+		Locale.setDefault(Locale.of("en", "US"));
+		GurobiSolution solution = GurobiLp.gurobi(file).get();
 		return solution;
 	}
 	
-	public static GurobiSolution gurobi(String file) {
+	public static Optional<GurobiSolution> gurobi(String file) {
 
 //		if (args.length < 1) {
 //			System.out.println("Usage: java Lp filename");
@@ -49,9 +55,10 @@ public class GurobiLp {
 //		String[] names = null;
 		Double objval = null;
 		GRBVar[] vars = null;
-		Map<String,Double> map = null;
+		Map<String, Double> map = null;
 		try {
 			GRBEnv env = new GRBEnv();
+			env.set("OutputFlag", "0"); // Suppress output
 			model = new GRBModel(env, file);
 
 			model.optimize();
@@ -64,37 +71,49 @@ public class GurobiLp {
 				optimstatus = model.get(GRB.IntAttr.Status);
 			}
 
-			if (optimstatus == GRB.Status.OPTIMAL) {
+//			if (optimstatus == GRB.Status.OPTIMAL || optimstatus == GRB.Status.SUBOPTIMAL) {
+//                System.out.println("Optimization was successful");
+//                System.out.println("Objective value: " + model.get(GRB.DoubleAttr.ObjVal));
+			// Get the variable values
 //				double objval = model.get(GRB.DoubleAttr.ObjVal);
 //				System.out.println("Optimal objective: " + objval);
-			} else if (optimstatus == GRB.Status.INFEASIBLE) {
-				System.out.println("Model is infeasible");
+//            } else if (optimstatus == GRB.Status.SUBOPTIMAL) {
+//                System.out.println("Suboptimal objective: " + model.get(GRB.DoubleAttr.ObjVal));
+//			} else if (optimstatus == GRB.Status.INFEASIBLE) {
+//				System.out.println("Model is infeasible");
+//
+//				// Compute and write out IIS
+//				model.computeIIS();
+//				model.write("model.ilp");
+//			} else if (optimstatus == GRB.Status.UNBOUNDED) {
+//				System.out.println("Model is unbounded");
+//			} else {
+//				System.out.println("Optimization was stopped with status = " + optimstatus);
+//			}
 
-				// Compute and write out IIS
-				model.computeIIS();
-				model.write("model.ilp");
-			} else if (optimstatus == GRB.Status.UNBOUNDED) {
-				System.out.println("Model is unbounded");
-			} else {
-				System.out.println("Optimization was stopped with status = " + optimstatus);
-			}
-			
-			objval = model.get(GRB.DoubleAttr.ObjVal);
-			vars = model.getVars();
-//			xvals = model.get(GRB.DoubleAttr.X, model.getVars());
-//			names = model.get(GRB.DoubleAttr.VarName, model.getVars());
-			map = new HashMap<>();
-			for(GRBVar v:vars) {
-				map.put(v.get(GRB.StringAttr.VarName),v.get(GRB.DoubleAttr.X));
-			}
+			if (optimstatus == GRB.Status.OPTIMAL || optimstatus == GRB.Status.SUBOPTIMAL) {
+//				System.out.println("Optimization was successful");
+				objval = model.get(GRB.DoubleAttr.ObjVal);
+				vars = model.getVars();
+//				xvals = model.get(GRB.DoubleAttr.X, model.getVars());
+//				names = model.get(GRB.DoubleAttr.VarName, model.getVars());
+				map = new HashMap<>();
+				for (GRBVar v : vars) {
+					map.put(v.get(GRB.StringAttr.VarName), v.get(GRB.DoubleAttr.X));
+				}
 
-			// Dispose of model and environment
-			model.dispose();
-			env.dispose();
+				// Dispose of model and environment
+				model.dispose();
+				env.dispose();
+			}
 
 		} catch (GRBException e) {
-			System.out.println("Error code: " + e.getErrorCode() + ". " + e.getMessage());
+			return Optional.empty();
+//			System.out.println("Error code: " + e.getErrorCode() + ". " + e.getMessage());
 		}
-		return GurobiSolution.of(objval,map);
+		if (model == null || objval == null || map == null) {
+			return Optional.empty();
+		}
+		return Optional.of(GurobiSolution.of(objval, map));
 	}
 }

@@ -4,6 +4,7 @@ package us.lsi.pli.tsp;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import org.jgrapht.Graph;
@@ -61,9 +62,13 @@ public class TspPLI {
 		TspPLI.n = TspPLI.graph.vertexSet().size();
 		System.out.println(TspPLI.graph);
 		AuxGrammar.generate(TspPLI.class,"modelos/tsp_1.lsi","ficheros/tsp_1.lp");
-		GurobiSolution solution = GurobiLp.gurobi("ficheros/tsp_1.lp");
-		Locale.setDefault(Locale.of("en", "US"));
-		System.out.println(solution.toString((s,d)->d>0.));
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/tsp_1.lp");
+		if (solution.isPresent()) {
+			Locale.setDefault(Locale.of("en", "US"));
+			System.out.println(solution.get().toString((s,d)->d>0.));
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 	
 	

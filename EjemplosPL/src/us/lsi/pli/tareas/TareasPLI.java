@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import us.lsi.common.Files2;
@@ -77,11 +78,15 @@ public class TareasPLI {
 				.map(e -> String.format("%d == %s", e.counter(), e.value()))
 				.collect(Collectors.joining("\n"));
 		Tarea.n = Tarea.tareas.size();
-		AuxGrammar.generate(TareasPLI.class,"modelos/tareas.lsi","ficheros/tareas.lp");
-		Locale.setDefault(Locale.of("en", "US"));
-		GurobiSolution solution = GurobiLp.gurobi("ficheros/tareas.lp");
-		System.out.println(solution.toString((s, d) -> d > 0.));
-		System.out.println(ss);
+		AuxGrammar.generate(TareasPLI.class,"modelos/tareas.lsi","ficheros/tareas.lp");		
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/tareas.lp");
+		if (solution.isPresent()) {
+			Locale.setDefault(Locale.of("en", "US"));
+			System.out.println(solution.get().toString((s, d) -> d > 0.));
+			System.out.println(ss);
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 
 	public static void main(String[] args) throws IOException {

@@ -2,6 +2,7 @@ package us.lsi.pli.colorgraph;
 
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import org.jgrapht.Graph;
@@ -50,8 +51,8 @@ public class ColorGraphPLI {
 		ColorGraphPLI.m = 10;
 		System.out.println(graph);
 		AuxGrammar.generate(ColorGraphPLI.class,"modelos/color.lsi","ficheros/color.lp");
-		GurobiSolution solution = GurobiLp.gurobi("ficheros/color.lp");
-		System.out.println(solution.toString((s,d)->d>0.));
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/color.lp");
+		System.out.println(solution.get().toString((s,d)->d>0.));
 	}
 	
 	public static void main(String[] args) throws IOException {

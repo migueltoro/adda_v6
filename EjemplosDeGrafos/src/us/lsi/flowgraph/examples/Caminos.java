@@ -2,6 +2,7 @@ package us.lsi.flowgraph.examples;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.jgrapht.Graph;
@@ -30,15 +31,20 @@ public class Caminos {
 	}
 	
 	public static void caminos_model(String model) throws IOException {
-		Graph<Integer,SimpleEdge<Integer>>  graph = leeGrafo("data/ruta_tren.txt");
+		Graph<Integer, SimpleEdge<Integer>> graph = leeGrafo("data/ruta_tren.txt");
 		Locale.setDefault(Locale.of("en", "US"));
-		System.out.println(graph);	
+		System.out.println(graph);
 		GraphData.graph = graph;
 		GraphData.n = graph.vertexSet().size();
-		AuxGrammar.generate(GraphData.class,model,"ficheros/disjuntas.lp");
-		Locale.setDefault(Locale.of("en", "US"));
-		GurobiSolution solution = GurobiLp.gurobi("ficheros/disjuntas.lp");
-		System.out.println(solution.toString((s,d)->s.contains("y") || d>0.));
+		AuxGrammar.generate(GraphData.class, model, "ficheros/disjuntas.lp");
+
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/disjuntas.lp");
+		if (solution.isPresent()) {
+			Locale.setDefault(Locale.of("en", "US"));
+			System.out.println(solution.get().toString((s, d) -> s.contains("y") || d > 0.));
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 	
 	public static void main(String[] args) throws IOException {

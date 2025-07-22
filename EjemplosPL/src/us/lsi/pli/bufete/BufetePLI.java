@@ -2,6 +2,7 @@ package us.lsi.pli.bufete;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import us.lsi.bufete.datos.DatosBufete;
@@ -35,12 +36,16 @@ public class BufetePLI {
 		Locale.setDefault(Locale.of("es", "ES"));
 		DatosBufete.iniDatos("ficheros/"+fichero);
 		AuxGrammar.generate(BufetePLI.class,"modelos/bufete.lsi","ficheros/bufete.lp");
-		GurobiSolution gs = GurobiLp.gurobi("ficheros/bufete.lp");		
-		DatosBufete.toConsole();
-//		SolucionBufete.create(gs.objVal, gs.values).toConsole();
-		System.out.println(gs.values);
-		System.out.println(gs.values.entrySet().stream().filter(e->e.getKey().equals("T_0")).collect(Collectors.toList()));
-		System.out.println(gs.values.get("T_0"));
+		Optional<GurobiSolution> gs = GurobiLp.gurobi("ficheros/bufete.lp");	
+		if (gs.isPresent()) {
+			DatosBufete.toConsole();
+//			SolucionBufete.create(gs.objVal, gs.values).toConsole();
+			System.out.println(gs.get().values);
+			System.out.println(gs.get().values.entrySet().stream().filter(e->e.getKey().equals("T_0")).collect(Collectors.toList()));
+			System.out.println(gs.get().values.get("T_0"));
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 	
 	

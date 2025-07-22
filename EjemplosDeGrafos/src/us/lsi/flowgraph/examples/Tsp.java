@@ -2,6 +2,7 @@ package us.lsi.flowgraph.examples;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.SimpleWeightedGraph;
@@ -36,9 +37,13 @@ public class Tsp {
 		GraphData.graph = graph3;
 		GraphData.n = graph3.vertexSet().size();
 		AuxGrammar.generate(GraphData.class,"models/tsp.lsi","ficheros/tsp.lp");
-		GurobiSolution solution = GurobiLp.gurobi("ficheros/tsp.lp");
-		Locale.setDefault(Locale.of("en", "US"));
-		System.out.println(solution.toString((s,d)->d>0.));		
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/tsp.lp");
+		if (solution.isPresent()) {
+			Locale.setDefault(Locale.of("en", "US"));
+			System.out.println(solution.get().toString((s,d)->d>0.));	
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 	
 	public static void shortestPath() throws IOException {	
@@ -62,8 +67,12 @@ public class Tsp {
 		GraphData.origin= graph3.index(origin);
 		GraphData.target= graph3.index(target);
 		AuxGrammar.generate(GraphData.class,"models/shortest_path.lsi","ficheros/shortest_path.lp");
-		GurobiSolution solution = GurobiLp.gurobi("ficheros/shortest_path.lp");
-		System.out.println(solution.toString((s,d)->s.startsWith("x_0") || d > 0.));		
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/shortest_path.lp");
+		if (solution.isPresent()) {
+			System.out.println(solution.get().toString((s,d)->s.startsWith("x_0") || d > 0.));	
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 
 

@@ -7,10 +7,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Scanner;
 
 //import asignacion.AssignLocationTechniquesLevel2PLI;
-import us.lsi.common.Files2;
 import us.lsi.gurobi.GurobiLp;
 import us.lsi.gurobi.GurobiSolution;
 import us.lsi.solve.AuxGrammar;
@@ -367,10 +367,15 @@ public class AssignLocationPLI {
 	
 	public static void asignLocTec_model() throws IOException {
 		AssignLocationPLI.leeFichero("ficheros/datos3comp.txt");
-		AuxGrammar.generate(AssignLocationPLI.class,"ficheros/asignLoc_cost.lsi","ficheros/asignLoc.lp");
-		GurobiSolution solution = GurobiLp.gurobi("ficheros/asignLoc.lp");
-		Locale.setDefault(Locale.of("en", "US"));
-		System.out.println(solution.toString((s,d)->d>0.));
+		AuxGrammar.generate(AssignLocationPLI.class,"ficheros/asignLoc_cost_filters.lsi","ficheros/asignLoc.lp");
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/asignLoc.lp");
+		if (solution.isPresent()) {
+			GurobiSolution sl = solution.get();
+			Locale.setDefault(Locale.of("en", "US"));
+			System.out.println(sl.toString((s,d)->d>0.));			
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 
 	public static void main(String[] args) throws IOException {

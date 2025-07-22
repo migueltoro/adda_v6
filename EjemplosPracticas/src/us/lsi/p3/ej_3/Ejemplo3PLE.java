@@ -3,6 +3,7 @@ package us.lsi.p3.ej_3;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import us.lsi.gurobi.GurobiLp;
 import us.lsi.gurobi.GurobiSolution;
@@ -31,9 +32,13 @@ public class Ejemplo3PLE {
 		alumnos = DatosAlumnos.getAlumnos();
 		
 		AuxGrammar.generate(Ejemplo3PLE.class,"modelos/ejemplo3.lsi","gurobi_models/ejemplo3.lp");
-		GurobiSolution solution = GurobiLp.gurobi("gurobi_models/ejemplo3.lp");
-		Locale.setDefault(Locale.of("en", "US"));
-		System.out.println(solution.toString((s,d)->d>0.));
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("gurobi_models/ejemplo3.lp");
+		if (solution.isPresent()) {
+			Locale.setDefault(Locale.of("en", "US"));
+			System.out.println(solution.get().toString((s,d)->d>0.));
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 	
 	public static void main(String[] args) throws IOException {	

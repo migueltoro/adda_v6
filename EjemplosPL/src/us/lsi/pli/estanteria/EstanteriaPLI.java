@@ -3,6 +3,7 @@ package us.lsi.pli.estanteria;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import us.lsi.common.Files2;
@@ -107,9 +108,14 @@ public class EstanteriaPLI {
 		System.out.println(Libro.libros.size());
 		System.out.println(Estante.estantes.size());
 		AuxGrammar.generate(EstanteriaPLI.class,"modelos/estanteria.lsi","ficheros/estanteria.lp");
-		Locale.setDefault(Locale.of("en", "US"));
-		GurobiSolution solution = GurobiLp.gurobi("ficheros/estanteria.lp");
-		System.out.println(solution.toString((s,d)->d>0.));
+		
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/estanteria.lp");
+		if (solution.isPresent()) {
+			Locale.setDefault(Locale.of("en", "US"));
+			System.out.println(solution.get().toString((s,d)->d>0.));
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 	
 	public static void main(String[] args) throws IOException {

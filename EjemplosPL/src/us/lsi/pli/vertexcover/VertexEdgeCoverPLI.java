@@ -1,6 +1,7 @@
 package us.lsi.pli.vertexcover;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,19 +47,18 @@ public class VertexEdgeCoverPLI {
 	public static void vertex_cover_model() throws IOException {
 		VertexEdgeCoverPLI.leeDatos("data/andalucia.txt");
 		System.out.println(GraphData.graph);
-		AuxGrammar.generate(GraphData.class,"modelos/vertex_cover.lsi","ficheros/vertex_cover.lp");
-		GurobiSolution solution = GurobiLp.gurobi("ficheros/vertex_cover.lp");
-		System.out.println(solution.toString((s,d)->d>0.));
-		Set<Ciudad> ciudades = solution.values.keySet().stream()
-				.filter(s->solution.values.get(s)>0)
-				.map(s->ciudad(s))
-				.collect(Collectors.toSet());
-		GraphColors.toDot(graph,
-				"ficheros/vertex_cover.gv", 
-				v->v.nombre(), 
-				e->e.nombre(), 
-				v->GraphColors.colorIf(Color.red,Color.black,ciudades.contains(v)),
-				e->GraphColors.style(Style.solid));
+		AuxGrammar.generate(GraphData.class, "modelos/vertex_cover.lsi", "ficheros/vertex_cover.lp");
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/vertex_cover.lp");
+		if (solution.isPresent()) {
+			System.out.println(solution.get().toString((s, d) -> d > 0.));
+			Set<Ciudad> ciudades = solution.get().values.keySet().stream().filter(s -> solution.get().values.get(s) > 0)
+					.map(s -> ciudad(s)).collect(Collectors.toSet());
+			GraphColors.toDot(graph, "ficheros/vertex_cover.gv", v -> v.nombre(), e -> e.nombre(),
+					v -> GraphColors.colorIf(Color.red, Color.black, ciudades.contains(v)),
+					e -> GraphColors.style(Style.solid));
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
 	}
 	
 	public static Carretera carretera(String s) {
@@ -72,20 +72,19 @@ public class VertexEdgeCoverPLI {
 	public static void edge_cover_model() throws IOException {
 		VertexEdgeCoverPLI.leeDatos("data/andalucia.txt");
 		System.out.println(GraphData.graph);
-		AuxGrammar.generate(GraphData.class,"modelos/edge_cover.lsi","ficheros/edge_cover.lp");
-		GurobiSolution solution = GurobiLp.gurobi("ficheros/edge_cover.lp");
-		System.out.println(solution.toString((s,d)->d>0.));
-		Set<Carretera> carreteras = solution.values.keySet().stream()
-				.filter(s->solution.values.get(s)>0)
-				.map(s->carretera(s))
-				.collect(Collectors.toSet());
-		GraphColors.toDot(graph,
-				"ficheros/edge_cover.gv", 
-				v->v.nombre(), 
-				e->e.nombre(), 
-				v->GraphColors.color(Color.black),
-				e->GraphColors.colorIf(Color.red,Color.black,carreteras.contains(e)));
-		
+		AuxGrammar.generate(GraphData.class, "modelos/edge_cover.lsi", "ficheros/edge_cover.lp");
+		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/edge_cover.lp");
+		if (solution.isPresent()) {
+			System.out.println(solution.get().toString((s, d) -> d > 0.));
+			Set<Carretera> carreteras = solution.get().values.keySet().stream()
+					.filter(s -> solution.get().values.get(s) > 0).map(s -> carretera(s)).collect(Collectors.toSet());
+			GraphColors.toDot(graph, "ficheros/edge_cover.gv", v -> v.nombre(), e -> e.nombre(),
+					v -> GraphColors.color(Color.black),
+					e -> GraphColors.colorIf(Color.red, Color.black, carreteras.contains(e)));
+		} else {
+			System.out.println("\n\n*****Modelo sin solución****");
+		}
+
 	}
 	
 	public static void main(String[] args) throws IOException {
