@@ -377,6 +377,7 @@ public class AssignLocationPLI {
 			System.out.println("\n\n*****Modelo sin solución****");
 		}
 	}
+	
 
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
