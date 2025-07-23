@@ -1,0 +1,39 @@
+head section
+
+Integer getN()
+Integer getL()
+Integer getT()
+Boolean precedes(Integer i, Integer l, Integer j, Integer m, Integer t)
+Boolean getAlpha(Integer i, Integer l)
+Boolean getGamma(Integer i, Integer t)
+Boolean getRho(Integer t, Integer l, Integer m)
+Boolean precedesAndNotGetRho(Integer i, Integer l, Integer j, Integer m, Integer t)
+Boolean getTR(Integer i)
+Integer getDIST(Integer t)
+Integer getTCOST(Integer i, Integer t)
+Integer getTCO2(Integer i, Integer t)
+Integer getTTIME(Integer i, Integer t)
+Integer getLCOST(Integer i, Integer l)
+Integer getLCO2(Integer i, Integer l)
+Integer getLTIME(Integer i, Integer l)
+Integer N = getN()
+Integer L = getL()
+Integer T = getT()
+
+goal section
+
+min  COST[0]
+
+constraints section
+
+sum(getTCOST(i,t) v[i,l,j,m,t], i in 0 .. N, l in 0 .. L, j in 0 .. N , m in 0 .. L, t in 0 .. T | precedes(i,l,j,m,t) && getTCOST(i,t) >0) = 0
+
+bin
+
+v[i,l,j,m,t], i in 0 .. N, l in 0 .. L, j in 0 .. N, m in 0 .. L, t in 0 .. T | precedes(i,l,j,m,t)
+
+int
+
+COST[0]
+CO2[0]
+TIME[0]

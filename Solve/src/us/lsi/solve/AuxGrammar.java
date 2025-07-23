@@ -41,6 +41,24 @@ public class AuxGrammar {
 		return String.format("Error en la línea %d, entre columnas %d-%d", line, columnStart, columnEnd);
 	}
 	
+	public static Boolean assertion(ParserRuleContext ctx, String txt, Boolean condition) {
+		Boolean r = true;
+		if (!condition) {
+			Integer line = ctx.getStart().getLine();
+			Integer columnStart = ctx.start.getCharPositionInLine();
+			Integer columnEnd = ctx.stop.getCharPositionInLine();
+			String txtError = ctx.getText();
+			Trio<Integer, Integer, Integer> t = Trio.of(line, columnStart, columnEnd);
+			if (!AuxGrammar.previousErrors.contains(t)) {
+				AuxGrammar.previousErrors.add(t);
+				AuxGrammar.nErrors = AuxGrammar.nErrors + 1;
+				AuxGrammar.errors.append(String.format("\n%s: ** %s **.\n%s", lineaColumna(ctx), txtError, txt));
+			}
+			r = false;
+		}
+		return r;
+	}
+	
 	public static Boolean notNull(ParserRuleContext ctx, Object idx) {
 		Boolean r = true;
 		if (idx == null) {
@@ -584,11 +602,18 @@ public class AuxGrammar {
 		AuxGrammar.dataClass = dataClass;
 		PLIModelLexer lexer = new PLIModelLexer(CharStreams.fromFileName(model));
 		PLIModelParser parser = new PLIModelParser(new CommonTokenStream(lexer));
-		ParseTree tree = parser.model();
-		String answer = asString(tree.accept(new PLIModelVisitorC()));
+		String answer=null;
+		try {
+			ParseTree tree = parser.model();
+			answer = asString(tree.accept(new PLIModelVisitorC()));
+		} catch (Exception e) {
+			AuxGrammar.nErrors++;
+			AuxGrammar.errors.append(e.getMessage());
+		}
 		if (AuxGrammar.nErrors > 0) {
 			AuxGrammar.errors.append("\n\n=======================\n\n");
-			AuxGrammar.errors.append(String.format("El modelo %s contiene %d errores y no se compiló correctamente.\n",model, AuxGrammar.nErrors));
+			AuxGrammar.errors.append(String.format("El modelo %s contiene %d errores y no se compiló correctamente.\n",
+					model, AuxGrammar.nErrors));
 			System.out.println(AuxGrammar.errors.toString());
 			System.exit(1);
 		} else {

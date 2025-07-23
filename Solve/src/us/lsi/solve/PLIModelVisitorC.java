@@ -274,6 +274,8 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 		Integer n = ctx.indx().size();
 		List<Limits> limites = new ArrayList<>(); 
 		List<String> indexNames = new ArrayList<>();
+//		System.out.println("n = "+n+" en "+ctx.indexed_elem().getText()); // Debugging line, can be removed later")
+		AuxGrammar.assertion(ctx, String.format("El número de indices no puede ser mayor que 5 y es %d",n), n <= 5);
 		for(int i = 0;i<n;i++) {
 			String name = ctx.indx(i).index_name.getText();
 			indexNames.add(name);
@@ -282,10 +284,10 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 			Limits lm = Limits.of(li, ls);
 			limites.add(lm);
 		}
+//		System.out.println(String.format("Element %s, size %d, indices: %s, limites: %s", ctx.indexed_elem().getText(), n, indexNames, limites));
 		List<String> r = new ArrayList<>();
-//		System.out.println(String.format("Element %s, size %d, indices: %s, limites: %s",ctx.indexed_elem().getText(),n,indexNames,limites));
-		String err = AuxGrammar.lineaColumna(ctx);
-		assert n <= 5 : String.format("%s, el número de indices no puede ser mayor que 5 y es %d",err,n);
+//		System.out.println(String.format("Element %s, size %d, indices: %s, limites: %s",ctx.indexed_elem().getText(),n,indexNames,limites));		String err = AuxGrammar.lineaColumna(ctx);
+//		assert n <= 5 : String.format("%s, el número de indices no puede ser mayor que 5 y es %d",err,n);
 		switch(n) {
 		case 0:
 			String s = AuxGrammar.asString(visit(ctx.indexed_elem()));
@@ -355,7 +357,7 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 						for (int l = limites.get(3).li; l < limites.get(3).ls; l++) {
 							AuxGrammar.values.put(indexNames.get(3), l);
 							for (int p = limites.get(4).li; p < limites.get(4).ls; p++) {
-								AuxGrammar.values.put(indexNames.get(4), l);
+								AuxGrammar.values.put(indexNames.get(4), p);
 								if (ctx.exp() == null || AuxGrammar.asBoolean(visit(ctx.exp()))) {
 									s = AuxGrammar.asString(visit(ctx.indexed_elem()));
 									r.add(s);

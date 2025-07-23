@@ -367,17 +367,16 @@ public class AssignLocationPLI {
 	
 	public static void asignLocTec_model() throws IOException {
 		AssignLocationPLI.leeFichero("ficheros/datos3comp.txt");
-		AuxGrammar.generate(AssignLocationPLI.class,"ficheros/asignLoc_cost_filters.lsi","ficheros/asignLoc.lp");
+		AuxGrammar.generate(AssignLocationPLI.class, "ficheros/asignLoc_cost_filters.lsi", "ficheros/asignLoc.lp");
 		Optional<GurobiSolution> solution = GurobiLp.gurobi("ficheros/asignLoc.lp");
 		if (solution.isPresent()) {
 			GurobiSolution sl = solution.get();
 			Locale.setDefault(Locale.of("en", "US"));
-			System.out.println(sl.toString((s,d)->d>0.));			
+			System.out.println(sl.toString((s, d) -> d > 0.));
 		} else {
 			System.out.println("\n\n*****Modelo sin solución****");
 		}
 	}
-	
 
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
