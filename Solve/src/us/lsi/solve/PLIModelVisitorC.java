@@ -212,32 +212,34 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	
 	@Override
 	public Object visitUnaryOpExpr(PLIModelParser.UnaryOpExprContext ctx) {
-		Object r = this.visit(ctx.right);
+		Object right = this.visit(ctx.right);
 		Boolean b = null;
-		switch (ctx.op.getText()) {
+		Object r = null;
+		String op = ctx.op.getText();
+		switch (op) {
 		case "(int)":
 			r = 0;
-			b = AuxGrammar.isOneOfTypes(ctx, r.getClass(), Integer.class, Double.class);
-			if(b) r = AuxGrammar.castInteger(r);
+			b = AuxGrammar.isOneOfTypes(ctx.right, right.getClass(), Integer.class, Double.class);
+			if(b) r = AuxGrammar.castInteger(right);
 			break;
 		case "(double)":
 			r = 0.;
-			b = AuxGrammar.isOneOfTypes(ctx.right, r.getClass(), Integer.class, Double.class);
-			r = AuxGrammar.castDouble(r);
+			b = AuxGrammar.isOneOfTypes(ctx.right, right.getClass(), Integer.class, Double.class);
+			r = AuxGrammar.castDouble(right);
 			break;
 		case "+":
 			r = 0;
-			b = AuxGrammar.isOneOfTypes(ctx.right, r.getClass(), Integer.class, Double.class);
+			b = AuxGrammar.isOneOfTypes(ctx.right, right.getClass(), Integer.class, Double.class);
 			break;
 		case "-":
 			r = 0;
-			AuxGrammar.isOneOfTypes(ctx.right, r.getClass(), Integer.class, Double.class);
-			r = AuxGrammar.minus(r);
+			AuxGrammar.isOneOfTypes(ctx.right, right.getClass(), Integer.class, Double.class);
+			r = AuxGrammar.minus(right);
 			break;
 		case "!":
 			r = true;
-			b = AuxGrammar.isOneOfTypes(ctx.right, r.getClass(), Boolean.class);
-			r = !AuxGrammar.asBoolean(r);
+			b = AuxGrammar.isType(ctx.right, right.getClass(), Boolean.class);
+			r = !AuxGrammar.asBoolean(right);
 			break;
 		}
 		return r;
@@ -561,8 +563,7 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	}
 	
 	@Override
-	public Object visitOpExpr(PLIModelParser.OpExprContext ctx) {
-		
+	public Object visitOpExpr(PLIModelParser.OpExprContext ctx) {		
 		String op = ctx.op.getText();
 		Object left = this.visit(ctx.left);
 		AuxGrammar.notNull(ctx,ctx.left);
