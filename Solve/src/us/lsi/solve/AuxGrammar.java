@@ -44,10 +44,16 @@ public class AuxGrammar {
 	public static Boolean assertion(ParserRuleContext ctx, String txt, Boolean condition) {
 		Boolean r = true;
 		if (!condition) {
-			Integer line = ctx.getStart().getLine();
-			Integer columnStart = ctx.start.getCharPositionInLine();
-			Integer columnEnd = ctx.stop.getCharPositionInLine();
-			String txtError = ctx.getText();
+			Integer line =0;
+			Integer columnStart=0;
+			Integer columnEnd=0;
+			String txtError=txt;
+			if (condition != null) {
+				line = ctx.getStart().getLine();
+				columnStart = ctx.start.getCharPositionInLine();
+				columnEnd = ctx.stop.getCharPositionInLine();
+				txtError = ctx.getText();
+			}
 			Trio<Integer, Integer, Integer> t = Trio.of(line, columnStart, columnEnd);
 			if (!AuxGrammar.previousErrors.contains(t)) {
 				AuxGrammar.previousErrors.add(t);
@@ -608,7 +614,7 @@ public class AuxGrammar {
 			answer = asString(tree.accept(new PLIModelVisitorC()));
 		} catch (Exception e) {
 			AuxGrammar.nErrors++;
-			AuxGrammar.errors.append(e.getMessage());
+			AuxGrammar.errors.append("\nError en Parser : "+e.getMessage());			
 		}
 		if (AuxGrammar.nErrors > 0) {
 			AuxGrammar.errors.append("\n\n=======================\n\n");

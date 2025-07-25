@@ -147,11 +147,14 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	    ints = AuxGrammar.allSpaces(ints)?ints:String.format("\nGeneral\n\n%s\n",ints);
 	    String bins = implicitBins();
 	    if(ctx.bin_vars()!=null) bins += AuxGrammar.asString(visit(ctx.bin_vars()));
-	    bins = AuxGrammar.allSpaces(bins)? bins:String.format("\nBinary\n\n%s\n",bins);
+	    bins = AuxGrammar.allSpaces(bins)? bins:String.format("\nBinary\n\n%s\n",bins);	   
 	    String semiContinous = "";
 	    if(ctx.semi_continuous_vars()!=null) semiContinous += AuxGrammar.asString(visit(ctx.semi_continuous_vars()));
 	    semiContinous = AuxGrammar.allSpaces(semiContinous)? semiContinous:String.format("\nSemi-continuous\n\n%s\n",semiContinous);
-		return String.format("%s\n%s\n%s\n%s\n%s\n%s\n%s\nEnd",goal,constraints,bounds,bins,ints,semiContinous,generalConstraints);
+	    Boolean vars = ctx.bin_vars() != null || ctx.int_vars() != null || 
+	    		ctx.semi_continuous_vars() != null;
+	    AuxGrammar.assertion(null,"No hay variables declaradas",vars);
+	    return String.format("%s\n%s\n%s\n%s\n%s\n%s\n%s\nEnd",goal,constraints,bounds,bins,ints,semiContinous,generalConstraints);
 	}
 	
 	
@@ -213,6 +216,7 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	@Override
 	public Object visitUnaryOpExpr(PLIModelParser.UnaryOpExprContext ctx) {
 		Object right = this.visit(ctx.right);
+		AuxGrammar.notNull(ctx, right);
 		Boolean b = null;
 		Object r = null;
 		String op = ctx.op.getText();
@@ -241,7 +245,9 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 			b = AuxGrammar.isType(ctx.right, right.getClass(), Boolean.class);
 			r = !AuxGrammar.asBoolean(right);
 			break;
-		}
+		default:
+			AuxGrammar.assertion(ctx, String.format("el operador %s es desconocido", op), false);
+		}		
 		return r;
 	}
 	
@@ -566,13 +572,13 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	public Object visitOpExpr(PLIModelParser.OpExprContext ctx) {		
 		String op = ctx.op.getText();
 		Object left = this.visit(ctx.left);
-		AuxGrammar.notNull(ctx,ctx.left);
+		AuxGrammar.notNull(ctx,left);
 		if (op.equals("&&") && !AuxGrammar.asBoolean(left))
 			return false;
 		if (op.equals("||") && AuxGrammar.asBoolean(left))
 			return true;
 		Object right = this.visit(ctx.right);
-		AuxGrammar.notNull(ctx, ctx.right);
+		AuxGrammar.notNull(ctx, right);
 		Object r = null;
 		Boolean b1 = null, b2 = null;
 		switch (op) {
@@ -654,8 +660,7 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 			if(b1 && b2) r = AuxGrammar.or(left, right);
 			break;
 		default:
-			String err = AuxGrammar.lineaColumna(ctx);
-			assert false : String.format("%s, operator %s desconocido",err, op);
+			AuxGrammar.assertion(ctx, String.format("el operador %s es desconocido", op), false);
 		}
 		return r;
 	}
