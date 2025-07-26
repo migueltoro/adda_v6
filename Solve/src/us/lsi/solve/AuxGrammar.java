@@ -611,6 +611,10 @@ public class AuxGrammar {
 		String answer=null;
 		try {
 			ParseTree tree = parser.model();
+			if (tree == null) {
+				AuxGrammar.nErrors++;
+				AuxGrammar.errors.append("\nEl resultado del Parser es null. ");
+			}
 			answer = asString(tree.accept(new PLIModelVisitorC()));
 		} catch (Exception e) {
 			AuxGrammar.nErrors++;

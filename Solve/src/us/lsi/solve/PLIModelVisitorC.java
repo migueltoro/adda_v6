@@ -151,9 +151,6 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	    String semiContinous = "";
 	    if(ctx.semi_continuous_vars()!=null) semiContinous += AuxGrammar.asString(visit(ctx.semi_continuous_vars()));
 	    semiContinous = AuxGrammar.allSpaces(semiContinous)? semiContinous:String.format("\nSemi-continuous\n\n%s\n",semiContinous);
-	    Boolean vars = ctx.bin_vars() != null || ctx.int_vars() != null || 
-	    		ctx.semi_continuous_vars() != null;
-	    AuxGrammar.assertion(null,"No hay variables declaradas",vars);
 	    return String.format("%s\n%s\n%s\n%s\n%s\n%s\n%s\nEnd",goal,constraints,bounds,bins,ints,semiContinous,generalConstraints);
 	}
 	
@@ -367,6 +364,7 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 							for (int p = limites.get(4).li; p < limites.get(4).ls; p++) {
 								AuxGrammar.values.put(indexNames.get(4), p);
 								if (ctx.exp() == null || AuxGrammar.asBoolean(visit(ctx.exp()))) {
+									System.out.println(ctx.exp().getText());
 									s = AuxGrammar.asString(visit(ctx.indexed_elem()));
 									r.add(s);
 								}
