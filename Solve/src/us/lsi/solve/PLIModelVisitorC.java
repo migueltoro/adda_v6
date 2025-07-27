@@ -364,7 +364,6 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 							for (int p = limites.get(4).li; p < limites.get(4).ls; p++) {
 								AuxGrammar.values.put(indexNames.get(4), p);
 								if (ctx.exp() == null || AuxGrammar.asBoolean(visit(ctx.exp()))) {
-									System.out.println(ctx.exp().getText());
 									s = AuxGrammar.asString(visit(ctx.indexed_elem()));
 									r.add(s);
 								}

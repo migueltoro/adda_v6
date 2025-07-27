@@ -12,7 +12,7 @@ import java.util.Scanner;
 import us.lsi.common.Files2;
 import us.lsi.gurobi.GurobiLp;
 import us.lsi.gurobi.GurobiSolution;
-import us.lsi.solve.AuxGrammar;
+import us.lsi.solve_test.AuxGrammar;
 
 public class AssignLocationPLIC {
 

@@ -11,7 +11,7 @@ import us.lsi.common.String2;
 import us.lsi.gurobi.GurobiLp;
 import us.lsi.gurobi.GurobiSolution;
 import us.lsi.mochila_test.DataMochila;
-import us.lsi.solve_test.AuxGrammar2;
+import us.lsi.solve_test.AuxGrammar;
 
 public class TestAllInValues {
 	
@@ -32,7 +32,7 @@ public class TestAllInValues {
 	}
 	
 	public static void test1(String file) throws IOException {
-		AuxGrammar2.generate(DataMochila.class,"ficheros/"+file+".lsi","ficheros/"+file+".lp");
+		AuxGrammar.generate(DataMochila.class,"ficheros/"+file+".lsi","ficheros/"+file+".lp");
 		GurobiSolution s = GurobiLp.solveSolution("ficheros/"+file+".lp");
 		System.out.println("\n\n\n\n");
 		System.out.println(String.format("Objetivo : %.2f",s.objVal));
@@ -52,7 +52,7 @@ public class TestAllInValues {
 	}
 	
 	public static void test2(String file) throws IOException {
-		AuxGrammar2.generate(DataMochila.class,"ficheros/"+file+".lsi","ficheros/"+file+".lp");
+		AuxGrammar.generate(DataMochila.class,"ficheros/"+file+".lsi","ficheros/"+file+".lp");
 	}
 
 	public static void main(String[] args) throws IOException {

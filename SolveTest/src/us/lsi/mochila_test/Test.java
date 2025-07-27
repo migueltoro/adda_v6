@@ -9,22 +9,22 @@ import java.util.stream.Collectors;
 import us.lsi.common.String2;
 import us.lsi.gurobi.GurobiLp;
 import us.lsi.gurobi.GurobiSolution;
-import us.lsi.solve.AuxGrammar;
-import us.lsi.solve.AuxGrammar.ListString;
-import us.lsi.solve.AuxGrammar.Type;
-import us.lsi.solve_test.AuxGrammar2;
+import us.lsi.solve_test.AuxGrammar;
+import us.lsi.solve_test.AuxGrammar.ListString;
+import us.lsi.solve_test.AuxGrammar.Type;
+
 
 public class Test {
 	
 	public static void mochila() throws IOException {
 		DataMochila.iniMochila();
-		AuxGrammar2.generate(DataMochila.class,"ficheros/mochila.lsi","ficheros/mochila.lp");
+		AuxGrammar.generate(DataMochila.class,"ficheros/mochila.lsi","ficheros/mochila.lp");
 		GurobiSolution s = GurobiLp.solveSolution("ficheros/mochila.lp");
 		String2.toConsole(s.toString((k,v)->v>0));
 	}
 	
 	public static void example() throws IOException {
-		AuxGrammar2.generate(DataMochila.class,"ficheros/model_3.txt","ficheros/model_3.lp");
+		AuxGrammar.generate(DataMochila.class,"ficheros/model_3.txt","ficheros/model_3.lp");
 		GurobiLp.solve("ficheros/model_3.lp");
 	}
 
