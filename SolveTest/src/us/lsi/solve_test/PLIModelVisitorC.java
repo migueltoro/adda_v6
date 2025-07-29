@@ -253,7 +253,18 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	public Object visitConstraints(PLIModelParser.ConstraintsContext ctx) {
 		Function<Integer,String> cn = i->AuxGrammar.constraintName(i);
 		Integer n = ctx.list().size();
-		Function<Integer,List<String>> cs = i->AuxGrammar.asListString(visit(ctx.list(i))); 
+		
+		List<List<String>> lcs = new ArrayList<>();
+		for(int i =0; i<n;i++) {
+			List<String> lc = AuxGrammar.asListString(visit(ctx.list(i)));
+			if (lc== null || lc.isEmpty()) {
+				String err = AuxGrammar.lineaColumna(ctx.list(i));
+				AuxGrammar.assertion(ctx.list(i),
+						String.format("%s, la lista de restricciones no puede estar vacía", err), false);
+			}
+			lcs.add(lc);
+		}
+		Function<Integer,List<String>> cs = i->lcs.get(i); 
 		Function<Integer,Stream<String>> sc = 
 					i ->Stream2.enumerate(cs.apply(i).stream().filter(ls->!ls.isEmpty()))
 				      .map(p->String.format("%s%d: %s",cn.apply(i),p.counter(),p.value()));

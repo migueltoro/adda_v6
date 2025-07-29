@@ -1,7 +1,9 @@
 package us.lsi.solve;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -608,18 +610,25 @@ public class AuxGrammar {
 		AuxGrammar.dataClass = dataClass;
 		PLIModelLexer lexer = new PLIModelLexer(CharStreams.fromFileName(model));
 		PLIModelParser parser = new PLIModelParser(new CommonTokenStream(lexer));
+		ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+        PrintStream originalErr = System.err;
+        System.setErr(new PrintStream(errContent));
 		String answer=null;
 		try {
 			ParseTree tree = parser.model();
-			if (tree == null) {
-				AuxGrammar.nErrors++;
-				AuxGrammar.errors.append("\nEl resultado del Parser es null. ");
-			}
 			answer = asString(tree.accept(new PLIModelVisitorC()));
+			String errorOutput = errContent.toString();
+			if (errorOutput != null && !errorOutput.isEmpty()) {
+				AuxGrammar.nErrors++;
+				AuxGrammar.errors.append("\nError en Parser : " + errorOutput);
+			}
 		} catch (Exception e) {
 			AuxGrammar.nErrors++;
 			AuxGrammar.errors.append("\nError en Parser : "+e.getMessage());			
-		}
+            e.printStackTrace();
+        } finally {
+        	System.setErr(originalErr);
+        }		
 		if (AuxGrammar.nErrors > 0) {
 			AuxGrammar.errors.append("\n\n=======================\n\n");
 			AuxGrammar.errors.append(String.format("El modelo %s contiene %d errores y no se compiló correctamente.\n",
