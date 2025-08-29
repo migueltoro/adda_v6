@@ -1,0 +1,15 @@
+Me puedes dar una versión funcional y otra recursiva por al cola del código e java siguiente?
+En la versión funcional puedes crear un record con los métodos necesarios para conseguir un versión más compacta?
+
+public static boolean esPalindromo2(String p) {
+
+	int i = 0;
+	int j = p.length();
+	Boolean b = true;
+	while(j - i > 1 && b) {
+		i = i + 1;
+		j = j - 1;
+		b = p.charAt(i) == p.charAt(j-1);
+	}
+	return b;
+}

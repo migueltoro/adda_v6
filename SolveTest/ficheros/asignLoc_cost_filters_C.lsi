@@ -38,11 +38,11 @@ sum(w[i,t], t in 0 .. T | getGamma(i,t)) = 1, i in 0 .. N | getTR(i)
 sum(w[i,t], t in 0 .. T | !getGamma(i,t)) = 0, i in 0 .. N
 
 x[i,l] + x[j,m] + w[i,t] - v[i,l,j,m,t] <= 2 , i in 0 .. N, l in 0 .. L, j in 0 .. N, m in 0 .. L, t in 0 .. T | precedes(i,j) )
-v[i,l,j,m,t] = 0, i in 0 .. N, l in 0 .. L, j in 0 .. N, m in 0 .. L, t in 0 .. T | precedes(i,j) && !getRho(t,l,m) )
+v[i,l,j,m,t] = 0, i in 0 .. N, l in 0 .. L, j in 0 .. N, m in 0 .. L, t in 0 .. T | precedes(i,j) && !getRho(t,l,m)
 
 bin
 
-x[i,l], i in 0 .. N, l in 0 .. L 
+x[i,l], i in 0 .. N, l in 0 .. L )
 w[i,t], i in 0 .. N, t in 0 .. T
 v[i,l,j,m,t], i in 0 .. N, l in 0 .. L, j in 0 .. N, m in 0 .. L, t in 0 .. T | precedes(i,j)
 

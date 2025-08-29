@@ -1,0 +1,17 @@
+Me puedes dar una versión imperativa sin streams y usando solo for e if del siguiente código funcional en java?
+
+public Map masBarato() {
+	return VuelosProgramados.of().todos().stream()
+			.collect(Collectors.groupingBy(VueloProgramado::ciudadDestino,
+				Collectors.collectingAndThen(
+					Collectors.reducing(
+						BinaryOperator.minBy(Comparator.comparing(VueloProgramado::precio))),e->e.get())));
+
+}
+
+public Map masBarato2() {
+	return VuelosProgramados.of().todos().stream()
+		.collect(Collectors.groupingBy(VueloProgramado::ciudadDestino,Collectors.collectingAndThen(
+				Collectors.minBy(Comparator.comparing(VueloProgramado::precio)),x->x.get())));
+
+}

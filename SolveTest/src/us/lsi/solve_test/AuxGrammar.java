@@ -21,6 +21,7 @@ import java.util.stream.IntStream;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -29,6 +30,8 @@ import us.lsi.common.Preconditions;
 import us.lsi.common.Trio;
 import us.lsi.model_test.PLIModelLexer;
 import us.lsi.model_test.PLIModelParser;
+
+
 
 
 public class AuxGrammar {
@@ -610,6 +613,8 @@ public class AuxGrammar {
 		AuxGrammar.dataClass = dataClass;
 		PLIModelLexer lexer = new PLIModelLexer(CharStreams.fromFileName(model));
 		PLIModelParser parser = new PLIModelParser(new CommonTokenStream(lexer));
+
+		
 		ByteArrayOutputStream errContent = new ByteArrayOutputStream();
         PrintStream originalErr = System.err;
         System.setErr(new PrintStream(errContent));

@@ -1,6 +1,5 @@
-// Generated from PLIModel.g4 by ANTLR 4.9.3
 package us.lsi.model_test;
-
+// Generated from PLIModel.g4 by ANTLR 4.9.3
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**

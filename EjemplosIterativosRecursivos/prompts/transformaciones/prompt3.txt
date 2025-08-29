@@ -1,0 +1,9 @@
+Me puedes dar una versión imperativa sin streams y usando solo for e if del siguiente código funcional en java?
+
+public Map fechasDistintas() {
+
+	Stream st = Vuelos.of().todas().stream();
+	return st.collect(Collectors.groupingBy(ocp -> ocp.vueloProgramado().ciudadDestino(),
+			Collectors.mapping(Vuelo::fecha,
+				Collectors.collectingAndThen(Collectors.toSet(),s->s.size()))));
+}
