@@ -1,0 +1,3 @@
+Me puedes diseñar un método que tome 
+a  un número, n entero no negativo y 
+en encuentre a potencia n de a de forma iterativa y con complejidad O(log n)?
