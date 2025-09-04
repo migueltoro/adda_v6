@@ -47,6 +47,7 @@ public class BinaryTrees {
 		case BTree<E>  t when t.left() instanceof BEmpty<E>  tl -> Optional.of(t.label());
 		case BTree<E>  t when t.left() instanceof BLeaf<E>  tl -> Optional.of(tl.label());
 		case BTree<E>  t when t.left() instanceof BTree<E>  tl -> minLabelOrdered(tl, cmp);
+		default -> Optional.empty();
 		};
 	}
 	
@@ -57,6 +58,7 @@ public class BinaryTrees {
 		case BTree<E>  t when t.right() instanceof BEmpty<E>  tr -> Optional.of(t.label());
 		case BTree<E>  t when t.right() instanceof BLeaf<E>  tr -> Optional.of(tr.label());
 		case BTree<E>  t when t.right() instanceof BTree<E>  tr -> maxLabelOrdered(tr, cmp);
+		default -> Optional.empty();
 		};
 	}
 	
@@ -92,6 +94,7 @@ public class BinaryTrees {
 		case BTree<E> t when cmp.compare(label, t.label()) == 0 -> true;
 		case BTree<E> t when cmp.compare(label, t.label()) < 0 -> containsLabelOrdered(t.left(), label, cmp);
 		case BTree<E> t when cmp.compare(label, t.label()) > 0  -> containsLabelOrdered(t.right(), label, cmp);
+		default -> false;
 		};
 	}
 	
@@ -130,6 +133,7 @@ public class BinaryTrees {
 			}
 			yield r;
 		}
+		default -> tree;
 		};
 		return s;
 	}
@@ -180,6 +184,7 @@ public class BinaryTrees {
 				}
 				yield r;
 		}
+		default -> r;
 		};
 	}
 	

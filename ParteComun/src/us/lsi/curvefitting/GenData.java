@@ -96,7 +96,8 @@ public class GenData {
 	 * @param numIterWarmup Número de iteraciones de warmup
 	 */
 	public static void tiemposEjecucion(Function<Integer,Long> algorithm,String ficheroTiempos,
-			Integer tMin,Integer tMax,Function<Integer,Integer> nextInc,Integer numIter,Function<Integer,Integer> numIterWarmup) {
+			Integer tMin,Integer tMax,Function<Integer,Integer> nextInc,
+			Integer numIter,Function<Integer,Integer> numIterWarmup) {
 		Map<Integer, Double> tiempos = new HashMap<>();
 		for (int t = tMin; t < tMax; t = nextInc.apply(t)) {
 			for (int i = 0; i < numIterWarmup.apply(t); i++) {

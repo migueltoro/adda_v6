@@ -104,6 +104,7 @@ public class BinaryTreesTest {
 		case BLeaf(var lb) when !ls.isEmpty() -> ls.get(0).equals(lb);
 		case BTree(var lb,BinaryTree<Character> lt, BinaryTree<Character> rt) when !ls.isEmpty() -> ls.get(0).equals(lb)
 				&& (existeLista(lt, ls.subList(1, n)) || existeLista(rt, ls.subList(1, n)));
+		default -> false;
 		};
 	}
 	
