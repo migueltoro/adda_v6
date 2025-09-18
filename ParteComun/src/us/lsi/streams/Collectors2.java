@@ -137,4 +137,11 @@ public class Collectors2 {
 				m->Multiset.of(m));
 	}
 	
+	public static <E> Collector<E,List<E>,List<E>> toListLeft() {
+		return Collector.of(
+			() -> new ArrayList<>(), 
+			(x, e) -> x.add(0,e), 
+			(x, y) -> List2.union(x,y), 
+			x -> x);
+	}
 }

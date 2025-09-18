@@ -3,6 +3,11 @@ package us.lsi.clase.digits;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
+
+import us.lsi.streams.Collectors2;
+import us.lsi.streams.Stream2;
 
 public class Digitos {
 	
@@ -64,16 +69,68 @@ public class Digitos {
 		return b;
 	}
 	
-	public static void test1() throws IOException {
-		Integer n = 2345789;
-		Integer a = 10;
-		List<Integer> ls = digitos(n,a);
-		System.out.println("Digitos = "+ls);
-		ls = digitosI(n,a);
-		System.out.println("Digitos I = "+ls);
-		System.out.println("Ceros = "+numeroDeCeros(n,a));
-		System.out.println("Entero = "+n+","+entero(ls,a));
-		System.out.println("Entero = "+n+","+inverso(n,a));
+	/**
+	 * Generates a list of digits of a given number in a specified base, 
+	 * accumulating the digits in reverse order (from least significant to most significant).
+	 *
+	 * @param n The number to extract digits from.
+	 * @param b The base to use for digit extraction.
+	 * @return A list of digits of the number `n` in base `b`, accumulated from most significant to least significant.
+	 */
+	public static List<Integer> digitosF(Integer n, Integer b){
+		Stream<Integer> s = Stream.iterate(n, x->x>0, x->x/b).map(x->x%b);
+		return s.collect(Collectors2.toListLeft()); //Acumula en la lista por la izquierda
+	}
+	
+	public static record H(Integer n, Integer a, Integer b) {
+		
+		public static H of(Integer n, Integer b) {
+			return new H(n, 0, b);
+		}
+		
+		public H nx() {
+			Integer d = n%b;
+			Integer a1 = a * b + d;
+			return new H(n/b, a1, b); //acumulador de Horner, aplicada a los díitos de mayor a menor
+		}
+		
+		public String toString() {
+			return String.format("(%d,%d)", n, a);
+		}
+		
+	}
+	
+	public static Integer enteroCondigitosInvertidos(Integer n, Integer b){
+		return Stream.iterate(H.of(n, b), x->x.nx()).dropWhile(x -> x.n() > 0)
+				.findFirst().get().a();
+	}
+	
+	public static Long numberF(List<Integer> digits, Integer b){
+		Stream<Integer> s1 = Stream.iterate(digits.size()-1, i->i >=0, i->i-1);
+		Stream<Integer> s2 = Stream.iterate(1, p->p*b);
+		LongStream s = Stream2.zip(s1,s2,(x,y)->digits.get(x)*y).mapToLong(x->x);
+		return s.sum();
+	}
+	
+	public static void test1() {
+		Integer n = 234578977;
+		Integer b = 10;
+//		List<Integer> ls = digitos(n,a);
+//		System.out.println("Digitos = "+ls);
+//		ls = digitosI(n,a);
+//		System.out.println("Digitos I = "+ls);
+//		System.out.println("Ceros = "+numeroDeCeros(n,a));
+//		System.out.println("Entero = "+n+","+entero(ls,a));
+//		System.out.println("Entero = "+n+","+inverso(n,a));
+//		System.out.println("Digitos = "+n+","+invierte(n,b));
+		List<Integer> ls = digitosF(n,b);
+		System.out.println("Número = "+n+","+ls);
+		System.out.println("Número = "+numberF(ls,b));
+		System.out.println("Número = "+enteroCondigitosInvertidos(n,b));	
+	}
+	
+	public static void main(String[] args) throws IOException {
+		test1();
 	}
 
 }
