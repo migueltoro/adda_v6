@@ -16,6 +16,28 @@ import us.lsi.graphs.Graphs2;
 import us.lsi.graphs.GraphsReader;
 import us.lsi.graphs.tour.ShortestTour;
 
+/**
+ * Resuelve un problema de recorrido m�nimo que pasa por un conjunto de
+ * v��rtices
+ * 
+ * @author Miguel Toro
+ * 
+ * Este código define la clase Tours, que calcula un recorrido más corto en un grafo de ciudades y carreteras andaluzas, pasando obligatoriamente por Jaén y yendo de Sevilla a Almería:
+ * 
+ * El método ciudad busca un objeto Ciudad en el grafo por su nombre.
+ * 
+ * En main:
+ * 		Carga el grafo desde ficheros/andalucia.txt, donde los vértices son ciudades y las aristas son carreteras ponderadas por kilómetros.
+ * 		Crea un objeto ShortestTour para calcular recorridos mínimos, usando un peso alto (1000 km) para carreteras inexistente
+ * 		Define el conjunto de ciudades obligatorias a visitar (en este caso, solo Jaén).
+ * 		Calcula el camino más corto desde Sevilla a Almería pasando por Jaén.
+ * 
+ * Imprime la lista de ciudades y carreteras del recorrido.
+ * 
+ * Genera un archivo .gv para visualizar el grafo, resaltando en negrita las aristas del recorrido hallado.
+ *
+ */
+
 public class Tours {
 	
 	public static Ciudad ciudad(Graph<Ciudad,Carretera> graph, String nombre) {

@@ -2,7 +2,6 @@ package us.lsi.graphs.examples;
 
 
 import java.util.List;
-
 import org.jgrapht.alg.cycle.HierholzerEulerianCycle;
 import org.jgrapht.alg.cycle.PatonCycleBase;
 import org.jgrapht.alg.interfaces.CycleBasisAlgorithm.CycleBasis;
@@ -15,6 +14,34 @@ import us.lsi.grafos.datos.Carretera;
 import us.lsi.grafos.datos.Ciudad;
 import us.lsi.graphs.Graphs2;
 import us.lsi.graphs.GraphsReader;
+
+/**
+ * Este método main realiza varias operaciones sobre un grafo de ciudades y
+ * carreteras usando la librería JGraphT:
+ *
+ * Carga del grafo: Lee un grafo ponderado desde el archivo
+ * ficheros/andalucia.txt, donde los vértices son objetos Ciudad y las aristas
+ * son objetos Carretera con pesos basados en kilómetros.
+ *
+ * Completa el grafo: Crea un grafo completo explícito (gc) a partir del
+ * original, asignando un peso alto (200000) a las aristas inexistentes y usando
+ * un peso por defecto para nuevas carreteras.
+ *
+ * Aproximación al TSP: Usa el algoritmo TwoApproxMetricTSP para encontrar un
+ * ciclo hamiltoniano aproximado (recorrido que pasa una vez por cada ciudad).
+ * Imprime la lista de ciudades y las aristas del camino hallado.
+ *
+ * Ciclo euleriano: Comprueba si el grafo original es euleriano (existe un ciclo
+ * que recorre cada arista exactamente una vez) usando HierholzerEulerianCycle e
+ * imprime el resultado.
+ * 
+ * Conjunto de ciclos: Calcula una conjunto de ciclos del grafo (conjunto de ciclos
+ * independientes) usando PatonCycleBase y la imprime como caminos en el grafo.
+ *
+ * En resumen, el código muestra cómo analizar y resolver problemas clásicos de
+ * grafos (TSP, ciclos eulerianos, base de ciclos) sobre un grafo de ciudades y
+ * carreteras, mostrando los resultados por consola.
+ **/
 
 public class Ciclos {
 	

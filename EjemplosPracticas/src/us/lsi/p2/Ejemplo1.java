@@ -9,7 +9,7 @@ import us.lsi.tiposrecursivos.BTree;
 public class Ejemplo1 {
 
 	/*
-	 * PI3 - Ejemplo 4
+	 * PI3 - Ejemplo
 	 * 
 	 * Implemente una función booleana que, dados un árbol binario de caracteres y
 	 * una lista de caracteres, determine si existe un camino en el árbol de la raíz
@@ -19,18 +19,18 @@ public class Ejemplo1 {
 	 */
 
 	
-	public static Boolean solucion_recursiva (BinaryTree<Character> tree,List<Character> list) {
-		return recursivo(tree,list,0);	
+	public static Boolean existe_camino(BinaryTree<Character> tree,List<Character> list) {
+		return existe_camino(tree,list,0);	
 	}
 
 	
-	public static Boolean recursivo(BinaryTree<Character> tree, List<Character> ls, int i) {
+	public static Boolean existe_camino(BinaryTree<Character> tree, List<Character> ls, int i) {
 		Integer n = ls.size();
 		return switch (tree) {
 		case BEmpty() -> false;
 		case BLeaf(var lb) -> n - i == 1 && ls.get(i).equals(lb);
-		case BTree(var lb, var lt, var rt) -> n - i > 0 && ls.get(i).equals(lb)
-				&& (recursivo(lt, ls, i+1) || recursivo(rt, ls, i+1));
+		case BTree(var lb, var lt, var rt) -> n - i > 1 && ls.get(i).equals(lb)
+				&& (existe_camino(lt, ls, i+1) || existe_camino(rt, ls, i+1));
 		};
 	}
 

@@ -27,13 +27,12 @@ public class TestEjemplo2 {
 		
 		System.out.println("\nSOLUCION RECURSIVA-PAR:\n");	
 		inputs.stream()
-		.forEach(x->System.out.println(x+": "+Ejemplo2.solucion_recursiva(x, PAR)));
+		.forEach(x->System.out.println(x+": "+Ejemplo2.todosLosNivelesCumplen(x, PAR)));
 
 		System.out.println("\nSOLUCION RECURSIVA-PRIMOS:\n");	
 		inputs.stream()
-			.forEach(x->System.out.println(x+": "+Ejemplo2.solucion_recursiva(x, PRIMO)));
+			.forEach(x->System.out.println(x+": "+Ejemplo2.todosLosNivelesCumplen(x, PRIMO)));
 
 
-	}
-}
+	}}
 

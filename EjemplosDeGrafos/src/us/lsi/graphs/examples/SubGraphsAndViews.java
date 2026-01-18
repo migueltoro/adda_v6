@@ -18,6 +18,31 @@ import us.lsi.graphs.Graphs2;
 import us.lsi.graphs.GraphsReader;
 import us.lsi.graphs.views.CompleteGraphView;
 
+/**
+ * Resuelve un problema de tour hamiltoniano
+ * 
+ * @author Miguel Toro
+ * 
+ * Este código construye y analiza un grafo de ciudades y carreteras, y resuelve el problema del ciclo hamiltoniano aproximado:
+ * 
+ * Carga del grafo:
+ * 		Lee un grafo ponderado desde ficheros/andalucia.txt, donde los vértices son ciudades (Ciudad) y las aristas son carreteras (Carretera), usando los kilómetros como peso.
+ * 		Vista de grafo completo:
+ * 		Crea una vista completa del grafo original (CompleteGraphView), añadiendo aristas faltantes con un peso alto (1000 km).
+ * 
+ * Ciclo hamiltoniano:
+ * 		Usa el algoritmo Held-Karp (HeldKarpTSP) para encontrar un ciclo hamiltoniano aproximado en el grafo completo.
+ * 
+ * Salida de resultados:
+ * 		Imprime la lista de aristas del ciclo encontrado en consola.
+ * 
+ * Visualización:
+ * 		Genera un archivo .gv para visualizar el grafo, resaltando en negrita las aristas que forman parte del ciclo hamiltoniano.
+ * 
+ * En resumen, el código resuelve y visualiza una aproximación al TSP (Traveling Salesman Problem) sobre un grafo de ciudades andaluzas.
+ *
+ */
+
 public class SubGraphsAndViews {
 
 	

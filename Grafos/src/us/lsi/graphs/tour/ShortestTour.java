@@ -19,7 +19,7 @@ import us.lsi.common.Set2;
 public class ShortestTour<V, E, G extends Graph<V, E>> {
 	
 	/**
-	 * @param <V> Tipo del vértice
+	 * @param <V> Tipo del vï¿½rtice
 	 * @param <E> Tipo de la arista
 	 * @param <G> Tipo del grafo
 	 * @param graph Grafo de entrada
@@ -48,8 +48,6 @@ public class ShortestTour<V, E, G extends Graph<V, E>> {
 	private static <V1,E1> Double walkWeightCalculator(GraphWalk<V1,E1> path) {
 		return path.getEdgeList().stream().mapToDouble(x->path.getGraph().getEdgeWeight(x)).sum();
 	}
-
-
 	
 	/**
 	 * @param startVertex Vertice inicial

@@ -16,7 +16,7 @@ import us.lsi.graphs.Graphs2;
 import us.lsi.graphs.GraphsReader;
 
 /**
- * Resulve un problema de coloreado de grafos
+ * Resuelve un problema de coloreado de grafos
  * 
  * @author Miguel Toro
  *

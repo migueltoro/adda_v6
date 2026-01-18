@@ -17,6 +17,25 @@ import us.lsi.grafos.datos.Ciudad;
 import us.lsi.graphs.Graphs2;
 import us.lsi.graphs.GraphsReader;
 
+/**
+ * Resuelve un problema del viajante de comercio
+ * 
+ * @author Miguel Toro
+ * 
+ * Este código define la clase Tsp, que realiza varios análisis sobre un grafo de ciudades y carreteras andaluzas usando JGraphT:
+ * 
+ * El método ciudad busca una ciudad en el grafo por su nombre.
+ * 
+ * En el método main:
+ * 		Carga el grafo desde ficheros/andalucia.txt, donde los vértices son ciudades y las aristas son carreteras ponderadas por kilómetros.
+ * 		Crea un grafo completo explícito (graph2), añadiendo aristas faltantes con un peso alto (1000 km).
+ * 		Usa el algoritmo TwoApproxMetricTSP para encontrar un ciclo hamiltoniano aproximado en el grafo completo y muestra la lista de ciudades, aristas y pesos del ciclo.
+ * 		Usa el algoritmo de Hierholzer para buscar un ciclo euleriano en el grafo original y muestra los resultados.
+ * 		Calcula el camino más corto entre Huelva y Almería en el grafo completo usando Dijkstra, mostrando el camino, las ciudades y los pesos.
+ * 
+ * En resumen, el código resuelve y muestra resultados de TSP, ciclo euleriano y camino más corto sobre un grafo de ciudades y carreteras.
+ */
+
 public class Tsp {
 	
 	public static Ciudad ciudad(Graph<Ciudad,Carretera> graph, String nombre) {

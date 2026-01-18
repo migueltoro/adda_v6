@@ -11,7 +11,7 @@ import us.lsi.tiposrecursivos.TNary;
 
 public class Ejemplo2 {
 	/*
-	PI3 - Ejemplo 5
+	PI3 - Ejemplo
 
 	Diseñe un algoritmo que dado un árbol n-ario Tree<E> y un predicado sobre E
 	devuelva una lista List<Boolean> de forma que el elemento i-ésimo de la lista será “True”
@@ -21,14 +21,14 @@ public class Ejemplo2 {
 	*/
 	
 
-	public static <E> List<Boolean> solucion_recursiva (Tree<E> t, Predicate<E> p){
+	public static <E> List<Boolean> todosLosNivelesCumplen(Tree<E> t, Predicate<E> p){
 		List<Boolean> res = new ArrayList<>();
-		recursivo (t,p,0,res);
+		todosLosNivelesCumplen(t,p,0,res);
 		return res;
 	}
 	
 	
-	private static <E> void recursivo(Tree<E> tree, Predicate<E> pred, int nivel, List<Boolean> res) {
+	private static <E> void todosLosNivelesCumplen(Tree<E> tree, Predicate<E> pred, int nivel, List<Boolean> res) {
 		if(res.size() <= nivel) res.add(true);
 		switch (tree) {
 		case TEmpty() -> {;}
@@ -39,7 +39,7 @@ public class Ejemplo2 {
 		case TNary(var lb, var chd) -> {
 			Boolean r = pred.test(lb) && res.get(nivel);
 			res.set(nivel, r);
-			chd.forEach(tc -> recursivo(tc, pred, nivel + 1, res));
+			chd.forEach(tc -> todosLosNivelesCumplen(tc, pred, nivel + 1, res));
 		}
 	}
 	

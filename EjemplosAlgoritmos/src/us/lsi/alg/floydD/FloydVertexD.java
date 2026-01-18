@@ -18,7 +18,7 @@ import us.lsi.hypergraphsD.HyperVertexD;
 public record FloydVertexD(Integer i,Integer j,Integer k) 
 		implements HyperVertexD<FloydVertexD,FloydEdgeD,Boolean,GraphWalk<Integer,SimpleEdge<Integer>>>{
 
-	public static Map<FloydVertexD,Sp<FloydEdgeD>> memory = new HashMap<>();
+	public static Map<FloydVertexD,Sp<Boolean,FloydEdgeD>> memory = new HashMap<>();
 	
 	public static FloydVertexD initial(Integer i,Integer j) {	
 		return new FloydVertexD(i,j,0);

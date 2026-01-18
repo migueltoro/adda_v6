@@ -1,6 +1,7 @@
 package us.lsi.tiposrecursivos;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -48,6 +49,14 @@ public sealed interface BinaryTree<E> permits BEmpty,BLeaf,BTree {
 	
 	public default Stream<BinaryTreeLevel<E>> byLevel() {
 		return BinaryTrees.byLevel(this);
+	}
+	
+	public default Stream<List<BinaryTree<E>>> allPath() {
+		return BinaryTrees.allPath(this,false);
+	}
+	
+	public default Stream<List<BinaryTree<E>>> allPath(Boolean emptyIncluded) {
+		return BinaryTrees.allPath(this,emptyIncluded);
 	}
 	
 	public static <E> BinaryTree<E> empty() {

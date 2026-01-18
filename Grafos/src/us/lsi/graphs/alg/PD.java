@@ -28,8 +28,8 @@ public class PD<V extends VirtualHyperVertex<V,E,A,S>,
 	public enum PDType{Min,Max}
 
 	public SimpleVirtualHyperGraph<V,E, A> graph;
-	private Comparator<Sp<E>> comparatorSp;
-	public Map<V,Sp<E>> solutionsTree;
+	private Comparator<Sp<A,E>> comparatorSp;
+	public Map<V,Sp<A,E>> solutionsTree;
 	private PDType type;
 	private V startVertex;
 	public Graph<VertexGraph<V,E>,SimpleEdge<VertexGraph<V,E>>> outGraph;
@@ -40,41 +40,41 @@ public class PD<V extends VirtualHyperVertex<V,E,A,S>,
 		this.startVertex = graph.getStartVertex();
 		this.type = type;
 		if(this.type == PDType.Min) this.comparatorSp = Comparator.naturalOrder();
-		if(this.type == PDType.Max) this.comparatorSp = Comparator.<Sp<E>>naturalOrder().reversed();
+		if(this.type == PDType.Max) this.comparatorSp = Comparator.<Sp<A,E>>naturalOrder().reversed();
 		this.solutionsTree = new HashMap<>();
 	}
 	
-	public Sp<E> search(){
+	public Sp<A,E> search(){
 		if(this.withGraph) outGraph = new SimpleDirectedWeightedGraph<>(null,null);
 		return search(this.startVertex);
 	}
 
-	public Sp<E> search(V actual) {
-		Sp<E> r = null;
+	public Sp<A,E> search(V actual) {
+		Sp<A,E> r = null;
 		if (this.solutionsTree.containsKey(actual)) {
 			r = this.solutionsTree.get(actual);
 		} else if (graph.isBaseCase(actual)) {
 			Double w = graph.baseCaseWeight(actual);
-			if(w!=null) r = Sp.of(w,null);
+			if(w!=null) r = Sp.of(null,w,null);
 			else r = null;
 			this.solutionsTree.put(actual, r);
 		} else {
-			List<Sp<E>> sps = new ArrayList<>();
+			List<Sp<A,E>> sps = new ArrayList<>();
 			for (E edge : graph.edgesOf(actual)) {
-				List<Sp<E>> spNeighbors = new ArrayList<>();
+				List<Sp<A,E>> spNeighbors = new ArrayList<>();
 				List<V> neighbords = graph.getEdgeTargets(edge);
 				for (V neighbor : neighbords) {
-					Sp<E> nb = search(neighbor);
+					Sp<A,E> nb = search(neighbor);
 					if (nb == null) {
 						spNeighbors = null;
 						break;
 					}
 					spNeighbors.add(nb);
 				}
-				Sp<E> spa = null;
+				Sp<A,E> spa = null;
 				if(spNeighbors != null) {
 					List<Double> solutions = spNeighbors.stream().map(sp->sp.weight()).toList();
-					spa = Sp.of(graph.getEdgeWeight(edge,solutions), edge);
+					spa = Sp.of(edge.action(), graph.getEdgeWeight(edge,solutions), edge);
 				}
 				sps.add(spa);
 				if(this.withGraph) this.completeGraph(actual,edge,neighbords);
@@ -114,7 +114,7 @@ public class PD<V extends VirtualHyperVertex<V,E,A,S>,
 		return graph;
 	}
 	
-	public Map<V, Sp<E>> getSolutionsTree() {
+	public Map<V, Sp<A,E>> getSolutionsTree() {
 		return solutionsTree;
 	}	
 	public PDType getType() {
@@ -132,22 +132,23 @@ public class PD<V extends VirtualHyperVertex<V,E,A,S>,
 		return new PD<V, E, A, S>(graph, type);
 	}
 
-	public record Sp<E>(Double weight, E edge) implements Comparable<Sp<E>> {
+	public record Sp<A,E>(A action, Double weight, E edge) implements Comparable<Sp<A,E>> {
 		
-		public static <E> Sp<E> of(Double weight,E edge) {
-			return new Sp<>(weight,edge);
+		public static <A,E> Sp<A,E> of(A action, Double weight,E edge) {
+			return new Sp<>(action,weight,edge);
 		}
 		
-		public static <E> Sp<E> of(Double weight) {
-			return new Sp<>(weight,null);
+		public static <A,E> Sp<A,E> of(Double weight) {
+			return new Sp<>(null,weight,null);
 		}
 		
-		public static <E> Comparator<Sp<E>> comparator() {
+		public static <A,E> Comparator<Sp<A,E>> comparator() {
 			return Comparator.naturalOrder();
 		}
+		
 
 		@Override
-		public int compareTo(Sp<E> sp) {
+		public int compareTo(Sp<A,E> sp) {
 			return this.weight.compareTo(sp.weight);
 		}
 

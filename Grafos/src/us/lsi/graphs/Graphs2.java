@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
+import org.jgrapht.GraphType;
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -21,8 +22,30 @@ import us.lsi.common.Preconditions;
 import us.lsi.graphs.views.CompleteGraphView;
 import us.lsi.graphs.views.PathToGraph;
 import us.lsi.graphs.views.SubGraphView;
+import org.jgrapht.alg.shortestpath.AllDirectedPaths;
 
 public class Graphs2 {
+	
+	/**
+	 * Devuelve todos los caminos dirigidos entre dos vértices dados en el grafo especificado,
+	 * con una longitud máxima de camino.
+	 *
+	 * @param <V> el tipo de los vértices del grafo
+	 * @param <E> el tipo de las aristas del grafo
+	 * @param graph el grafo sobre el que buscar los caminos
+	 * @param source el vértice de origen
+	 * @param target el vértice de destino
+	 * @param maxPathLength la longitud máxima permitida para los caminos (en número de aristas)
+	 * @return un conjunto con todos los caminos entre source y target que cumplen la longitud máxima
+	 */
+	public static <V, E> Set<GraphPath<V, E>> allPathsBetweenVertices(Graph<V, E> graph, 
+			V source, V target,
+			Integer maxPathLength) {
+		AllDirectedPaths<V, E> allPaths = new AllDirectedPaths<>(graph);
+		return allPaths.getAllPaths(source, target, true, maxPathLength)
+				.stream().collect(Collectors.toSet());
+	}
+	
 	
 	public static <V, E> Double weightOfEdge(Graph<V,E> graph, V v1, V v2) {
 		E e = graph.getEdge(v1,v2); 
@@ -107,9 +130,16 @@ public class Graphs2 {
 		return gs;
 	}
 	
+	public static <V, E> SimpleDirectedWeightedGraph<V, E> toDirectedWeightedGraph(Graph<V, E> graph, Function<E,E> edgeReverse) {
+		GraphType type = graph.getType();
+		if (type.isDirected()) {
+			return (SimpleDirectedWeightedGraph<V, E>) graph;
+		} else {
+			return toDirectedWeightedGraph((SimpleWeightedGraph<V, E>) graph, edgeReverse);
+		}
+	}
 	
-	public static <V, E> SimpleDirectedWeightedGraph<V, E> toDirectedWeightedGraph(SimpleWeightedGraph<V, E> graph,
-			Function<E, E> edgeReverse) {
+	public static <V, E> SimpleDirectedWeightedGraph<V, E> toDirectedWeightedGraph(SimpleWeightedGraph<V, E> graph, Function<E,E> edgeReverse) {
 		SimpleDirectedWeightedGraph<V, E> gs = new SimpleDirectedWeightedGraph<V, E>(graph.getVertexSupplier(),
 				graph.getEdgeSupplier());
 		for (V v : graph.vertexSet()) {
@@ -121,14 +151,23 @@ public class Graphs2 {
 			Double w = graph.getEdgeWeight(e);
 			gs.addEdge(s, t, e);
 			gs.setEdgeWeight(e, w);
-			E e1 = edgeReverse.apply(e);
-			gs.addEdge(t, s, e1);
-			gs.setEdgeWeight(e1, w);
+			E e2 = edgeReverse.apply(e);
+			gs.addEdge(t, s, e2);
+			gs.setEdgeWeight(e2, w);
 		}
 		return gs;
 	}
+	
+	public static <V,E> SimpleDirectedGraph<V,E> toDirectedGraph(Graph<V,E> graph,Function<E,E> edgeReverse){
+		GraphType type = graph.getType();
+		if (type.isDirected()) {
+			return (SimpleDirectedGraph<V,E>) graph;
+		} else {
+			return toDirectedGraph((SimpleGraph<V, E>) graph,edgeReverse);
+		}
+	}
 
-	public static <V,E> SimpleDirectedGraph<V,E> toDirectedGraph(SimpleGraph<V,E> graph){
+	public static <V,E> SimpleDirectedGraph<V,E> toDirectedGraph(SimpleGraph<V,E> graph,Function<E,E> edgeReverse){
 		SimpleDirectedGraph<V,E> gs = 
 				new SimpleDirectedGraph<V,E>(
 						graph.getVertexSupplier(), 
@@ -138,8 +177,8 @@ public class Graphs2 {
 			gs.addVertex(v);
 		}
 		for(E e:graph.edgeSet()){			
-			gs.addEdge(graph.getEdgeSource(e), graph.getEdgeTarget(e));
-			gs.addEdge(graph.getEdgeTarget(e), graph.getEdgeSource(e));
+			gs.addEdge(graph.getEdgeSource(e), graph.getEdgeTarget(e),e);
+			gs.addEdge(graph.getEdgeTarget(e), graph.getEdgeSource(e),edgeReverse.apply(e));
 		}
 		return gs;
 	}
@@ -244,10 +283,10 @@ public class Graphs2 {
 	 */
 	public static <V,E> SimpleDirectedWeightedGraph<V,E> toDirectedWeightedGraphFlow(
 			SimpleWeightedGraph<V,E> graph, 
-			Function<E,E> edgeReverse, 
 			Set<V> sources, 
-			Set<V> targets){
-		SimpleDirectedWeightedGraph<V,E> gs = Graphs2.toDirectedWeightedGraph(graph, edgeReverse);
+			Set<V> targets,
+			Function<E,E> edgeReverse) {
+		SimpleDirectedWeightedGraph<V,E> gs = Graphs2.toDirectedWeightedGraph(graph,edgeReverse);
 		Set<E> remove = new HashSet<>();
 		for(E e:gs.edgeSet()) {
 			V s = gs.getEdgeSource(e);

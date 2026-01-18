@@ -13,6 +13,28 @@ import us.lsi.grafos.datos.Ciudad;
 import us.lsi.graphs.Graphs2;
 import us.lsi.graphs.GraphsReader;
 
+/**
+ * Calcula los componentes conexos de un grafo
+ * 
+ * @author Miguel Toro
+ *
+ *Este código define una clase Componentes que analiza la conectividad de un grafo de ciudades y carreteras usando JGraphT.
+ *En el método main:
+ *
+ *Carga el grafo desde el archivo ficheros/andalucia.txt, donde los vértices son ciudades y las aristas son carreteras ponderadas por kilómetros.
+ *Busca dos ciudades concretas: "Sevilla" y "Almeria".
+ *
+ *Usa ConnectivityInspector para:
+ *
+ *	Comprobar si el grafo es conexo (isConnected).
+ *	Comprobar si existe un camino entre Sevilla y Almería (pathExists).
+ *	Obtener todas las componentes conexas (connectedSets).
+ *	Obtener la componente conexa de Sevilla (connectedSetOf).
+ *
+ *Imprime los resultados por consola.
+ *En resumen, el código muestra cómo analizar la conectividad de un grafo de ciudades y carreteras.
+ */
+
 public class Componentes {
 	
 	public static Ciudad ciudad(Graph<Ciudad,Carretera> graph, String nombre) {

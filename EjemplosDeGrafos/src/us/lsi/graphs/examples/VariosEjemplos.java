@@ -66,6 +66,14 @@ public class VariosEjemplos {
 				Graphs2::simpleGraph);
 	}
 	
+	/**
+	 * Calcula los caminos más cortos entre todos los pares de vértices de un grafo.
+	 *
+	 * @param <V> el tipo de los vértices
+	 * @param <E> el tipo de las aristas
+	 * @param g el grafo sobre el que se calculan los caminos mínimos
+	 * @return un conjunto con los caminos más cortos entre cada par de vértices distintos
+	 */
 	
 	public static <V,E> Set<GraphPath<V,E>> distanciasMinimas(Graph<V,E> g){
 		List<V> vertices = g.vertexSet().stream().toList();
@@ -79,20 +87,61 @@ public class VariosEjemplos {
 		return s;
 	}
 	
+	/**
+	 * Calcula un árbol de recubrimiento mínimo para el grafo dado usando el algoritmo de Kruskal.
+	 *
+	 * @param <V> el tipo de los vértices
+	 * @param <E> el tipo de las aristas
+	 * @param g el grafo sobre el que se calcula el árbol de recubrimiento mínimo
+	 * @return el árbol de recubrimiento mínimo como un objeto SpanningTree
+	 */
 	public static <V,E> SpanningTree<E> recubrimientoMinimo(Graph<V,E> g){
 		KruskalMinimumSpanningTree<V,E> a = new KruskalMinimumSpanningTree<>(g);
 		return a.getSpanningTree();
 	}
 	
+	/**
+	 * Calcula un recubrimiento mínimo de vértices para el grafo dado usando un algoritmo exacto recursivo.
+	 *
+	 * @param <V> el tipo de los vértices
+	 * @param <E> el tipo de las aristas
+	 * @param g el grafo sobre el que se calcula el recubrimiento de vértices
+	 * @return el recubrimiento mínimo de vértices como un objeto VertexCover
+	 */
 	public static <V,E> VertexCover<V> recubrimientoVertices(Graph<V,E> g){
 		VertexCoverAlgorithm<V> a = new RecursiveExactVCImpl<>(g);
 		return a.getVertexCover();
 	}
 	
+	/**
+	 * Determina si un grafo  todos los vértices tienen grado par.
+	 *
+	 * @param <V> el tipo de los vértices
+	 * @param <E> el tipo de las aristas
+	 * @param g el grafo a comprobar
+	 * @return true si todos los vértices tienen grado par, false en caso contrario
+	 * 
+	 * La propiedad comprobada en el método (todos los vértices tienen grado par) 
+	 * es una condición necesaria y suficiente para que un grafo conexo sea euleriano. 
+	 * Un grafo es euleriano si existe un ciclo que recorre cada arista exactamente una 
+	 * vez y termina en el mismo vértice. 
+	 * Según el teorema de Euler, esto solo es posible si todos los vértices tienen grado par, 
+	 * ya que cada vez que se entra a un vértice por una arista, se debe salir por otra, 
+	 * requiriendo un número par de aristas en cada vértice. Por eso, si todos los grados son pares, 
+	 * el grafo puede tener un ciclo euleriano.
+	 */
 	public static <V,E> Boolean esEuleriano(Graph<V,E> g){
 		return g.vertexSet().stream().allMatch(v->g.degreeOf(v)%2==0);
 	}
 	
+	/**
+	 * Calcula un ciclo euleriano en el grafo dado usando el algoritmo de Hierholzer.
+	 *
+	 * @param <V> el tipo de los vértices
+	 * @param <E> el tipo de las aristas
+	 * @param g el grafo sobre el que se busca el ciclo euleriano
+	 * @return un objeto GraphPath que representa el ciclo euleriano encontrado
+	 */
 	public static <V,E> GraphPath<V,E> caminoEuleriano(Graph<V,E> g){
 		EulerianCycleAlgorithm<V,E> a = new HierholzerEulerianCycle<V,E>();
 		return a.getEulerianCycle(g);

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.GraphWalk;
@@ -19,10 +20,14 @@ import us.lsi.graphs.SimpleEdge;
 
 public class FloydPD {
 	
-	public static record Sp(Boolean action,Double weight) implements Comparable<Sp> {
+	public static record Sp(Boolean action,Double weight,FloydEdge edge) implements Comparable<Sp> {
 		
-		public static Sp of(Boolean a, Double weight) {
-			return new Sp(a, weight);
+		public static Sp of(Boolean a, Double weight,FloydEdge edge) {
+			return new Sp(a, weight,edge);
+		}
+		
+		public static Sp of(Double weight) {
+			return new Sp(null, weight,null);
 		}
 		
 		@Override
@@ -41,47 +46,52 @@ public class FloydPD {
 		FloydPD.startVertex = startVertex;
 	}
 	
-	public Map<FloydVertex,Sp> search(){
+	public static Map<FloydVertex,Sp> search(){
 		Map<FloydVertex,Sp> memory = new HashMap<>();
 		search(FloydPD.startVertex,memory);
 		return memory;
 	}
+	
+	public static Sp edgeSp(FloydVertex actual, Boolean a, Integer nbn, List<Double> nbWeights) {
+		return nbWeights.size() == nbn ? Sp.of(a,actual.edge(a).weight(nbWeights),actual.edge(a)): null;
+	}
+	
+	public static Sp edgeSp(FloydVertex actual, Boolean a, Map<FloydVertex, Sp> memory) {
+		List<FloydVertex> neighbors = actual.neighbors(a);
+		return neighbors.stream()
+				.map(v -> search(v, memory))
+				.takeWhile(s -> s != null)
+				.map(s -> s.weight().doubleValue())
+				.collect(Collectors.collectingAndThen(Collectors.toList(),
+						ls->edgeSp(actual,a,neighbors.size(),ls)));
+	}
+	
+	public static Sp vertexSp(FloydVertex actual,Map<FloydVertex, Sp> memory) {
+		List<Sp> sps = new ArrayList<>();			
+		for (Boolean a : actual.actions()) {
+			Sp spa = edgeSp(actual,a, memory);
+			sps.add(spa);
+		}
+		Sp r = sps.stream().filter(s -> s != null).min(Comparator.naturalOrder()).orElse(null);
+		return r;
+	}
 
-	public Sp search(FloydVertex actual, Map<FloydVertex, Sp> memory) {
+	public static Sp search(FloydVertex actual, Map<FloydVertex, Sp> memory) {
 		Sp r = null;
 		if (memory.containsKey(actual)) {
 			r = memory.get(actual);
 		} else if (actual.isBaseCase()) {
 			Double w = actual.baseCaseWeight();
-			if (w != null)
-				r = Sp.of(null, w);
+			if (w != null) r = Sp.of(w);
 			memory.put(actual, r);
 		} else {
-			List<Sp> sps = new ArrayList<>();			
-			for (Boolean a : actual.actions()) {
-				List<Sp> spsa = new ArrayList<>();
-				FloydEdge e = actual.edge(a);
-				for (FloydVertex v : actual.neighbors(a)) {
-					Sp spa = search(v, memory);
-					if (spa == null) {
-						spsa = null;
-						break;
-					}
-					spsa.add(spa);
-				}
-				Sp sp = null;
-				if (spsa!=null && !spsa.isEmpty()) {
-					sp = Sp.of(a, e.weight(spsa.stream().map(s->s.weight()).toList()));
-				}
-				sps.add(sp);
-			}
-			r = sps.stream().filter(s -> s != null).min(Comparator.naturalOrder()).orElse(null);
+			r = vertexSp(actual, memory);
 			memory.put(actual, r);
 		}
 		return r;
 	}
 	
-	public GraphWalk<Integer,SimpleEdge<Integer>> solucion(FloydVertex p, Map<FloydVertex,Sp> memory) {
+	public static GraphWalk<Integer,SimpleEdge<Integer>> solucion(FloydVertex p, Map<FloydVertex,Sp> memory) {
 		GraphWalk<Integer,SimpleEdge<Integer>> r;
 		Sp sp = memory.get(p);
 		if(sp.action() == null) {
@@ -116,12 +126,12 @@ public class FloydPD {
 		
 		FloydVertex start = FloydVertex.initial(origen,destino);
 		
-		FloydPD a = FloydPD.of(start);
+		FloydPD.of(start);
 		
-		Map<FloydVertex, Sp> r = a.search();
+		Map<FloydVertex, Sp> r = search();
 		
 		
-		System.out.println(a.solucion(start, r).getVertexList().stream()
+		System.out.println(FloydPD.solucion(start, r).getVertexList().stream()
 				.map(i->DatosFloyd.graphI.vertex(i))
 				.toList());
 	}

@@ -90,6 +90,14 @@ public sealed interface Tree<E> permits TEmpty, TLeaf, TNary{
 		return Trees.byLevel(this);
 	}
 	
+	public default Stream<List<Tree<E>>> allPath(){
+		return Trees.allPath(this, false);
+	}
+	
+	public default Stream<List<Tree<E>>> allPath(Boolean emptyIncluded){
+        return Trees.allPath(this, emptyIncluded);
+	}
+	
 	public default List<Tree<E>> level(Integer n){
 		return this.byLevel().filter(e->e.level().equals(n)).map(e->e.tree()).toList();
 	}

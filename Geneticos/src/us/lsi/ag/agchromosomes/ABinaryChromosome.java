@@ -90,7 +90,7 @@ public class ABinaryChromosome<S> extends BinaryChromosome implements AChromosom
 	
 	@Override
 	public Chromosome initialChromosome() {
-		return ARandomKey.getInitialChromosome();
+		return ABinaryChromosome.getInitialChromosome();
 	}
 	
 	@Override

@@ -1,9 +1,12 @@
 package us.lsi.graphs.examples;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.traverse.BreadthFirstIterator;
 import org.jgrapht.traverse.DepthFirstIterator;
 
@@ -49,15 +52,28 @@ public class Recorridos {
 		
 		BreadthFirstIterator<Ciudad, Carretera> ra = new BreadthFirstIterator<>(graph,c);
 		Stream<Ciudad> sa = Stream2.ofIterator(ra);
+		List<Ciudad> la = sa.toList();
 		Integer pa = ra.getDepth(c2);
 		Ciudad pva = ra.getParent(c2);
 		Carretera sta = ra.getSpanningTreeEdge(c2);
-		List<Ciudad> la = sa.toList();
+		
 		
 		String2.toConsole("%s", la);
+		String2.toConsole("Profundidad de %s es %d",c2.nombre(),pa);
+		String2.toConsole("Padre de %s es %s",c2.nombre(),pva.nombre());
+		String2.toConsole("Arista del �rbol de expansin de %s es %s",c2.nombre(),sta);
 		
 		GraphColors.<Ciudad,Carretera>toDot(graph,"ficheros/andalucia.gv",x->x.nombre(),x->x.nombre()+"--"+x.km());
 		
+		SimpleDirectedGraph<Ciudad, Carretera> gd = Graphs2.toDirectedGraph(graph,x->x.reverse());
+		GraphColors.<Ciudad,Carretera>toDot(gd,"ficheros/andalucia_dir.gv",x->x.nombre(),x->x.nombre()+"--"+x.km());
+	
+		var pts = Graphs2.allPathsBetweenVertices(gd, c, c2, null);
+
+        System.out.println(pts.stream().map(ls->ls.getVertexList()).collect(Collectors.toSet()));
+		for (GraphPath<Ciudad, Carretera> p : pts) {
+			System.out.println(p.getVertexList());
+		}
 	}
 
 }

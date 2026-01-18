@@ -7,6 +7,7 @@
 module ejemplos_algoritmos {
 	
 	exports us.lsi.alg.floyd;
+	exports us.lsi.alg.floyd.manual;
 	exports us.lsi.alg.monedas;
 	exports us.lsi.alg.typ;
 	exports us.lsi.alg.reinas;

@@ -1,6 +1,7 @@
 package us.lsi.tiposrecursivos;
 
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -8,10 +9,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Stack;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import us.lsi.common.Files2;
+import us.lsi.colors.GraphColors;
 import us.lsi.common.List2;
 import us.lsi.common.MutableType;
 import us.lsi.streams.Stream2;
@@ -26,6 +26,11 @@ public class BinaryTrees {
 	public static <E> Stream<BinaryTreeLevel<E>> byLevel(BinaryTree<E> tree) {
 		return Stream2.ofIterator(BreadthPathBinaryTree.of(tree));
 	}
+	
+	public static <E> Stream<List<BinaryTree<E>>> allPath(BinaryTree<E> tree,Boolean emptyIncluded) {
+		return Stream2.ofIterator(AllPathBinaryTree.of(tree,emptyIncluded));
+	}
+	
 	
 	
 	public static <E> Optional<E> minLabel(BinaryTree<E> tree, Comparator<Optional<E>> cmp) {
@@ -311,7 +316,7 @@ public class BinaryTrees {
 			BinaryTree<E> actual = stack.pop();
 			switch (actual) {
 			case BTree<E> t -> {
-				for (BinaryTree<E> v : List.of(t.left(), t.right())) {
+				for (BinaryTree<E> v : List.of(t.right(),t.left())) {
 					stack.add(v);
 				}
 			}
@@ -375,12 +380,81 @@ public class BinaryTrees {
 		
 	}
 	
-	public static void test1() {
-		List<String> filas = Files2.streamFromFile("ficheros/test2.txt").collect(Collectors.toList());
-		BinaryTree<String> tree = null;
-		for (String fila : filas) {
-			tree = BinaryTree.parse(fila);
-			System.out.println(tree);
+	public static class AllPathBinaryTree<E> implements Iterator<List<BinaryTree<E>>>, Iterable<List<BinaryTree<E>>> {
+
+		public static record Frame<E>(BinaryTree<E> tree, Boolean visited) {
+			public static <R> Frame<R> of(BinaryTree<R> tree, Boolean visited) {
+				return new Frame<R>(tree, visited);
+			}
+
+			@Override
+			public String toString() {
+				return String.format("(%s,%b)", this.tree.isEmpty()?"_":this.tree.optionalLabel().get(), this.visited);
+			}
+		}
+
+		public static <E> AllPathBinaryTree<E> of(BinaryTree<E> tree,Boolean emptyIncluded) {
+			return new AllPathBinaryTree<E>(tree, emptyIncluded);
+		}
+
+		private Stack<Frame<E>> stack;
+		private List<BinaryTree<E>> path;
+		private List<BinaryTree<E>> newPath;
+		private Boolean emptyIncluded;
+
+		public AllPathBinaryTree(BinaryTree<E> tree,Boolean emptyIncluded) {
+			super();
+			this.stack = new Stack<>();
+			this.stack.add(Frame.of(tree, false));
+			this.path = new ArrayList<>();
+			this.newPath = null;
+			this.emptyIncluded = emptyIncluded;
+			advance();
+		}
+
+		@Override
+		public Iterator<List<BinaryTree<E>>> iterator() {
+			return this;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return this.newPath != null;
+		}
+
+		private void advance() {
+			this.newPath = null;
+			while (this.newPath == null && !this.stack.isEmpty()) {
+				Frame<E> actual = stack.pop();
+				BinaryTree<E> tree = actual.tree;
+				if (!actual.visited) {
+					this.path.add(tree);
+					this.stack.push(Frame.of(tree, true));
+					switch (tree) {
+					case BEmpty<E> t -> {
+						if (this.emptyIncluded) {
+							this.newPath = new ArrayList<>(this.path);
+						}
+					}
+					case BLeaf<E> t -> {
+						this.newPath = new ArrayList<>(this.path);
+					}
+					case BTree(var lb, var lt, var rt) -> {
+						this.stack.add(Frame.of(rt, false));
+						this.stack.add(Frame.of(lt, false));
+					}					
+					}
+				} else {
+					this.path.remove(this.path.size() - 1);
+				}
+			}
+		}
+
+		@Override
+		public List<BinaryTree<E>> next() {
+			List<BinaryTree<E>> old = new ArrayList<>(this.newPath);
+			advance();
+			return old;
 		}
 	}
 	
@@ -394,7 +468,7 @@ public class BinaryTrees {
 		System.out.println(t1);
 		System.out.println(t2);
 		System.out.println(t6);
-		String ex = "-43.7(2.1,abc(-27.3(_,2),78.2(3,4)))";
+		String ex = "-43.7(2.1,abc(-27.3(/_,2),78.2(3,4)))";
 		BinaryTree<String> t7 = BinaryTree.parse(ex);
 		System.out.println(t7);
 		System.out.println(List2.reverse(List2.of(1, 2, 3, 4, 5, 6, 7, 8, 9)));
@@ -404,9 +478,20 @@ public class BinaryTrees {
 	}
 	
 	public static void test3() {
-		String ex = "-43.7(2.1,abc(-27.3(_,2),78.2(3,4)))";
+		String ex = "-43.7(2.1,abc(-27.3(/_,2),78.2(3,4)))";
 		BinaryTree<String> t7 = BinaryTree.parse(ex);		
 		System.out.println(t7);
+		System.out.println("-------------");
+		System.out.println(t7);
+		List<String> l1 = t7.byDepth()
+				.map(t->switch(t) {
+				case BEmpty<String> te -> "_";
+				case BLeaf<String> tl -> tl.label();
+				case BTree<String> tn -> tn.label();
+				}
+				).toList();
+		System.out.println(l1);
+		System.out.println("-------------");
 		BinaryTrees.byLevel(t7).forEach(t->System.out.println(t));
 		System.out.println("______________");
 		System.out.println(t7);
@@ -416,7 +501,7 @@ public class BinaryTrees {
 	
 	
 	public static void test7() {
-		String ex = "[4;7](2(1(0,_),3),7(5(_,6),10(9(8,_),11(_,12))))";
+		String ex = "[4;7](2(1(0,/_),3),7(5(/_,6),10(9(8,/_),11(/_,12))))";
 		BinaryTree<String> t0 = BinaryTree.parse(ex);
 		System.out.println(t0);
 		System.out.println(BinaryTrees.containsLabel(t0,"3"));
@@ -428,9 +513,28 @@ public class BinaryTrees {
 		System.out.println(t0);
 	}
 	
+	public static <E> List<E> toListLabels(List<BinaryTree<E>> path) {
+		return path.stream().map(t->t.optionalLabel().orElse(null)).toList();
+	}
+	
+	public static void test9() {
+		String ex = "4(2(1(0,/_),3),7(5(/_,6),10(9(8,/_),11(/_,12))))";
+		BinaryTree<String> t7 = BinaryTree.parse(ex);
+		GraphColors.toDot(t7,"ficheros/tree2.gv");
+		System.out.println(t7);
+		System.out.println("-------------");
+		List<List<String>> l1 = t7.allPath()
+				.map(t->toListLabels(t))
+				.toList();
+		System.out.println(l1.size());
+		for (List<String> p : l1) {
+			System.out.println(p);
+		}
+	}
+	
 	
 	public static void main(String[] args) {
-		test8();
+		test9();
 	}
 	
 	

@@ -36,4 +36,8 @@ public record Carretera(Integer id, Double km, String nombre) {
 		return "("+nn+this.km+")";
 	}
 	
+	public Carretera reverse() {
+		return Carretera.of(this.km, this.nombre);
+	}
+	
 }

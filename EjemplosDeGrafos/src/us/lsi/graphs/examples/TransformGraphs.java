@@ -18,10 +18,12 @@ public class TransformGraphs {
 				Carretera::km);
 		System.out.println(graph.vertexSet());
 		System.out.println(graph.edgeSet());
-		Graph<Ciudad, Carretera> graph2 = Graphs2.toDirectedWeightedGraph(graph,(Carretera x)->Carretera.of(x.km(),x.nombre()));
+		Graph<Ciudad, Carretera> graph2 = Graphs2.toDirectedWeightedGraph(graph,c->c.reverse());
 		System.out.println("_______________");
 		System.out.println(graph2.vertexSet());
 		System.out.println(graph2.edgeSet());
+		
+		
 	}
 
 }

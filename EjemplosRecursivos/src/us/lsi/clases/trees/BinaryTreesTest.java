@@ -31,7 +31,14 @@ public class BinaryTreesTest {
 		};
 	}
 
-	
+	/**
+	 * Crea una copia profunda de un árbol binario.
+	 * Replica la estructura y las etiquetas de cada nodo del árbol original.
+	 *
+	 * @param tree Árbol binario a copiar.
+	 * @param <E> Tipo de las etiquetas de los nodos.
+	 * @return Una copia del árbol binario.
+	 */
 	public static <E> BinaryTree<E> copy(BinaryTree<E> tree) {
 		return switch(tree) {
 		case BEmpty() -> BinaryTree.empty(); 
@@ -39,7 +46,15 @@ public class BinaryTreesTest {
 		case BTree(var lb,var lt, var rt) -> BinaryTree.binary(lb, copy(lt), copy(rt));	
 		};	
 	}
-		
+	
+	/**
+	 * Crea una copia profunda de un árbol binario, invirtiendo los subárboles izquierdo y derecho en cada nodo.
+	 * Replica la estructura y las etiquetas, pero los hijos se intercambian recursivamente.
+	 *
+	 * @param tree Árbol binario a copiar e invertir.
+	 * @param <E> Tipo de las etiquetas de los nodos.
+	 * @return Una copia invertida del árbol binario.
+	 */
 	public static <E> BinaryTree<E> reverseCopy(BinaryTree<E> tree) {
 		return switch(tree) {
 		case BEmpty() -> BinaryTree.empty(); 
@@ -47,6 +62,15 @@ public class BinaryTreesTest {
 		case BTree(var lb,var lt, var rt)  -> BinaryTree.binary(lb, reverseCopy(rt), reverseCopy(lt));
 		};	
 	}
+	
+	
+	/**
+	 * Convierte un árbol binario en una lista de sus etiquetas siguiendo el
+	 * recorrido postorden.
+	 *
+	 * @param tree El árbol binario a convertir.
+	 * @return Una lista con las etiquetas del árbol en orden postorden.
+	 */
 	
 	public static <E> List<E> toListPostOrden(BinaryTree<E> tree) {
 		return switch(tree) {
@@ -64,28 +88,73 @@ public class BinaryTreesTest {
 		}
 		};
 	}
+	
+	public static <E> List<E> toListPostOrden2(BinaryTree<E> tree) {
+		List<E> r = new ArrayList<>();
+		toListPostOrden2(tree, r);
+		return r;
+	}
+	
+	public static <E> List<E> toListPostOrden2(BinaryTree<E> tree, List<E> r) {
+		switch (tree) {
+		case BEmpty() -> {}
+		case BLeaf(var lb) -> r.add(lb);
+		case BTree(var lb, var lt, var rt) -> {
+			toListPostOrden2(lt, r);
+			toListPostOrden2(rt, r);
+			r.add(lb);
+			}
+		};
+		return r;
+	}
+	
+	/**
+	 * Calcula de forma recursiva la suma de las etiquetas de las etiquetas de un árbol binario
+	 * que cumplen con un predicado.
+	 *
+	 * @param tree Árbol binario de enteros.
+	 * @param predicate Predicado que deben cumplir las etiquetas de los nodos.
+	 * @return La suma de las etiquetas que cumplen el predicado.
+	 */
 
-	public static Integer sumIfPredicate(BinaryTree<Integer> tree, Predicate<Integer> predicate) {
+	public static Integer sumIfPredicateR(BinaryTree<Integer> tree, Predicate<Integer> predicate) {
 		return switch (tree) {
 		case BEmpty() -> 0;
 		case BLeaf(var lb) -> predicate.test(lb) ? lb : 0;
 		case BTree(var lb,var lt, var rt) -> (predicate.test(lb) ? lb: 0) + 
-			sumIfPredicate(lt, predicate) + sumIfPredicate(rt, predicate);
+			sumIfPredicateR(lt, predicate) + sumIfPredicateR(rt, predicate);
 		};
 	}
 	
-	public static Integer sumIfPredicate2(BinaryTree<Integer> tree, Predicate<Integer> predicate) {
+	/**
+	 * Calcula de forma iterativa la suma de las etiquetas de los nodos 
+	 * de un árbol binario que cumplen con un predicado,
+	 * recorriendo el árbol en profundidad.
+	 *
+	 * @param tree Árbol binario de enteros.
+	 * @param predicate Predicado que deben cumplir las etiquetas de los nodos.
+	 * @return La suma de las etiquetas que cumplen el predicado.
+	 */
+	
+	public static Integer sumIfPredicateI(BinaryTree<Integer> tree, Predicate<Integer> predicate) {
 		return tree.byDepth()
 		.map(t -> t.optionalLabel().orElse(0))
 		.filter(predicate)
-		.mapToInt(lb -> lb).sum();
+		.mapToInt(lb -> lb)
+		.sum();
 	}
 
-	public static Boolean sumaEtiquetas(BinaryTree<Integer> tree) {
-		return tree.byDepth()
-				.filter(e->e instanceof BTree<Integer> t && !t.left().isEmpty() && !t.right().isEmpty())
-				.allMatch(e->e instanceof BTree<Integer> t && 
-						t.label().equals(t.left().optionalLabel().get()+t.right().optionalLabel().get()));
+	/**
+	 * Verifica si todos los nodos de un árbol binario cumplen con un predicado.
+	 * Recorre el árbol en profundidad y aplica el predicado a cada nodo.
+	 *
+	 * @param tree Árbol binario a analizar.
+	 * @param predicate Predicado que deben cumplir los nodos.
+	 * @param <E> Tipo de las etiquetas de los nodos.
+	 * @return true si todos los nodos cumplen el predicado, false en caso contrario.
+	 */
+	public static <E> Boolean todosCumplen(BinaryTree<E> tree, Predicate<BinaryTree<E>> predicate) {
+		return tree.byDepth().allMatch(t -> predicate.test(t));			
 	}
 	
 	/**
@@ -141,65 +210,49 @@ public class BinaryTreesTest {
 	}
 	
 	/**
-	 * Método auxiliar para contar el número de nodos que cumplen con una condición específica en cada nivel 
-	 * de un árbol binario.
-	 * En este caso la condición es que el arbol tenga dos hijos no vacíos y 
+	 * Comprueba en la raiz de un árbol binario la condición de que el arbol tenga dos hijos no vacíos y 
 	 * que la suma de las etiquetas de los hijos se igual a la etiqueta del nodo.
-	 *
-	 * @param tree el árbol binario a analizar
-	 * @param ls la lista que almacena el número de nodos que cumplen con la condición en cada nivel
-	 * @param level el nivel actual del árbol
 	 */
 	
-	public static Boolean verify(BinaryTree<Integer> tree) {
+	public static Boolean sumaIgualAEtiquetasHijos(BinaryTree<Integer> tree) {
 		return switch (tree) {
-		case BTree(var label,var left,var right) when left.isEmpty() || right.isEmpty() -> false;
 		case BTree(var label,var left,var right) -> 
+			!left.isEmpty() && !right.isEmpty() &&
 			label.equals(left.optionalLabel().get()+right.optionalLabel().get()) ;		
 		default -> false;
         };
 	}
 	
-	public static Boolean verify2(BinaryTree<Integer> tree) {
-		return switch (tree) {
-		case BTree(var label,BEmpty(),var right)  -> false;
-		case BTree(var label,var left, BEmpty())  -> false;
-		case BTree(Integer label,BLeaf(Integer lbl),BLeaf(Integer lbr)) -> label.equals(lbl+lbr);		
-		case BTree(Integer label,BLeaf(Integer lbl),BTree(Integer lbr,var left,var right)) -> label.equals(lbl+lbr);
-		case BTree(Integer label,BTree(Integer lbl,var left,var right),BLeaf(Integer lbr)) -> label.equals(lbl+lbr);
-		case BTree(Integer label,BTree(Integer lbl,var leftl,var rightl),BTree(Integer lbr,var leftr,var rightr)) -> label.equals(lbl+lbr);
-		default -> false;
-        };
-	}
-	
 	/**
-	 * Cuenta el número de nodos que cumplen con una condición específica en cada nivel de un árbol binario.
-	 * En este caso, la condición es que el árbol tenga dos hijos no vacíos y que la suma de las etiquetas 
-	 * de los hijos sea igual a la etiqueta del nodo.
+	 * Cuenta el número de nodos que cumplen con una condición específica 
+	 * en cada nivel de un árbol binario de forma iterativa.
 	 *
 	 * @param tree el árbol binario a analizar
+	 * @param pd la condición que deben cumplir los nodos
 	 * @return una lista con el número de nodos que cumplen con la condición en cada nivel
 	 */
 	
-	public static List<Integer> numVerifyI(BinaryTree<Integer> tree) {
+	public static List<Integer> cuantosVerificanPorNivelI(BinaryTree<Integer> tree, Predicate<BinaryTree<Integer>> pd) {
 		Integer heigth = tree.height();
 		List<Integer> ls = List2.nCopies(0, heigth+1);
         tree.byLevel()
-        	.filter(p->verify(p.tree()))
+        	.filter(p->pd.test(p.tree()))
             .forEach(p->ls.set(p.level(),ls.get(p.level())+1));
         return  ls;
     }
 	
 	/**
-	 * Método auxiliar para contar el número de nodos que cumplen con una condición específica en cada nivel de un árbol binario de forma recursiva.
-	 * En este caso, la condición es que el árbol tenga dos hijos no vacíos y que la suma de las etiquetas de los hijos sea igual a la etiqueta del nodo.
+	 * Cuenta el número de nodos que cumplen con una condición específica 
+	 * en cada nivel de un árbol binario de forma recursiva.
 	 *
 	 * @param tree el árbol binario a analizar
+	 * @param pd la condición que deben cumplir los nodos
+	 * @return una lista con el número de nodos que cumplen con la condición en cada nivel
 	 */
 	
-	public static List<Integer> numVerifyR(BinaryTree<Integer> tree) {
+	public static List<Integer> cuantosVerificanPorNivelR(BinaryTree<Integer> tree, Predicate<BinaryTree<Integer>> pd) {
 		List<Integer> ls = new ArrayList<>();
-		numVerifyR(tree, ls, 0);
+		cuantosVerificanPorNivelR(tree,pd, ls, 0);
 		return ls;
     }
 	
@@ -212,15 +265,15 @@ public class BinaryTreesTest {
 	 * @param level el nivel actual del árbol
 	 */
 	
-	public static void numVerifyR(BinaryTree<Integer> tree, List<Integer> ls, Integer level) {
+	public static void cuantosVerificanPorNivelR(BinaryTree<Integer> tree, Predicate<BinaryTree<Integer>> pd, List<Integer> ls, Integer level) {
 		if (ls.size() <= level) ls.add(0);
         switch(tree) {
         case BEmpty() -> {}
         case BLeaf(var lb) -> {}
         case BTree(Integer label, BinaryTree<Integer> left, BinaryTree<Integer> right)  -> {
-        	if(verify(tree)) ls.set(level, ls.get(level) + 1);
-        	numVerifyR(left, ls, level +1);
-        	numVerifyR(right, ls, level +1);
+        	if(pd.test(tree)) ls.set(level, ls.get(level) + 1);
+        	cuantosVerificanPorNivelR(left, pd, ls, level +1);
+        	cuantosVerificanPorNivelR(right, pd, ls, level +1);
         }
         }
     }
@@ -239,7 +292,7 @@ public class BinaryTreesTest {
 		BinaryTree<Integer> tree3 = BinaryTrees.removeOrdered(tree2,9,Comparator.naturalOrder());
 		System.out.println(tree3.toString());
 		System.out.println(tree3.isOrdered(Comparator.naturalOrder()));
-		System.out.println(sumIfPredicate(tree3,x->x%2==0));
+		System.out.println(sumIfPredicateI(tree3,x->x%2==0));
 		BinaryTree<Integer> tree4 = copy(tree);
 		System.out.println(tree.equals(tree4));
 	}
@@ -315,7 +368,7 @@ public class BinaryTreesTest {
 		String ex = "4(2(1(0,/_),3),2(0(/_,6),2(9(8,/_),11(/_,12))))";
 		BinaryTree<Integer> t0 = BinaryTree.parse(ex, e->Integer.parseInt(e));
 		System.out.println(t0);
-		System.out.println(numVerifyI(t0));
+		System.out.println(sumaIgualAEtiquetasHijos(t0));
 		System.out.println(t0.height());
 		GraphColors.toDot(t0,"ficheros/t0.gv");
     }

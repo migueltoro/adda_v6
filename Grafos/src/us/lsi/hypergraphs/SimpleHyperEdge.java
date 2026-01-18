@@ -6,5 +6,5 @@ public interface SimpleHyperEdge<V,E,A> {
 	V source();
 	List<V> targets();
 	A action();
-	Double weight(List<Double> solutions);
+	Double weight(List<Double> targetsWeight);
 }

@@ -43,7 +43,7 @@ public class TestEjemplo1 {
 			
 			System.out.println("Arbol: "+tree+
 					"\tSecuencia: "+chars+"\t["+
-					Ejemplo1.solucion_recursiva(tree,chars)+"]");
+					Ejemplo1.existe_camino(tree,chars)+"]");
 			
 		}
 		);
