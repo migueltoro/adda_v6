@@ -46,11 +46,11 @@ El algoritmo de programación dinámica usa memoria. Tiene una formulación recu
 
   
 
-$$ f(p) = \begin{cases} sbp(p) & b(p) \\ \underset{a \in A_p}{\large M} \ g(p,a) & \neg b(p) 0 \end{cases} $$
+$$ f(p) = \begin{cases} sbp(p) & b(p) \\ \\ \underset{a \in A_p}{\large M} \ g(p,a) & \neg b(p) 0 \end{cases} $$
 
 $$ g(p,a) = \underset{h \in nx(p,a)}{\large CBS} \ f(h) $$
 
-$$ sl(p) = \begin{cases} sb(p) & b(p) \\ \underset{h \in nx(p,a(f(p)))}{\large CS} \ sl(h) & \neg b(p) \end{cases} $$
+$$ sl(p) = \begin{cases} sb(p) & b(p) \\ \\ \underset{h \in nx(p,a(f(p)))}{\large CS} \ sl(h) & \neg b(p) \end{cases} $$
 
 ## Propiedades de los operadores
 
