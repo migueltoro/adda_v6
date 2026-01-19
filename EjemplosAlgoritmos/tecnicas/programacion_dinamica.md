@@ -44,7 +44,6 @@ El algoritmo de programación dinámica usa memoria. Tiene una formulación recu
 
 ## Definiciones de las funciones
 
-  
 
 $$ f(p) = \begin{cases} sbp(p) & b(p) \\ \\ \underset{a \in A_p}{\large M} \ g(p,a) & \neg b(p) 0 \end{cases} $$
 
