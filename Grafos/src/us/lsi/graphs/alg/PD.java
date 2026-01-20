@@ -55,7 +55,7 @@ public class PD<V extends VirtualHyperVertex<V,E,A,S>,
 			r = this.solutionsTree.get(actual);
 		} else if (graph.isBaseCase(actual)) {
 			Double w = graph.baseCaseWeight(actual);
-			if(w!=null) r = Sp.of(null,w,null);
+			if(w!=null) r = Sp.of(w);
 			else r = null;
 			this.solutionsTree.put(actual, r);
 		} else {
@@ -122,7 +122,7 @@ public class PD<V extends VirtualHyperVertex<V,E,A,S>,
 	}
 	
 	public GraphTree<V,E,A,S> searchTree(V vertex){
-		return GraphTree.optimalTree(vertex, solutionsTree);
+		return GraphTree.graphTree(vertex, solutionsTree);
 	}
 	
 	public static <V extends VirtualHyperVertex<V, E, A,S>, E extends SimpleHyperEdge<V, E, A>, A, S> 
@@ -146,10 +146,9 @@ public class PD<V extends VirtualHyperVertex<V,E,A,S>,
 			return Comparator.naturalOrder();
 		}
 		
-
 		@Override
 		public int compareTo(Sp<A,E> sp) {
-			return this.weight.compareTo(sp.weight);
+			return this.weight.compareTo(sp.weight());
 		}
 
 	}

@@ -44,13 +44,22 @@ El algoritmo de programación dinámica usa memoria. Tiene una formulación recu
 
 ## Definiciones de las funciones
 
+la función *f(p)* calcula la solución parcial asociada a un vértice
 
-$$ f(p) = \begin{cases} sbp(p) & b(p) \\ \\ \underset{a \in A_p}{\large M} \ g(p,a) & \neg b(p) 0 \end{cases} $$
-
+```math 
+f(p) = \begin{cases} sbp(p) & b(p) \\
+ \underset{a \in A_p}{\large M} \ g(p,a) & \neg b(p)
+ \end{cases} $$
+```
+La función *g(p)* calcula la solución parcial asociada a un vértice si tomamos la alternativa *a*
 $$ g(p,a) = \underset{h \in nx(p,a)}{\large CBS} \ f(h) $$
 
-$$ sl(p) = \begin{cases} sb(p) & b(p) \\ \\ \underset{h \in nx(p,a(f(p)))}{\large CS} \ sl(h) & \neg b(p) \end{cases} $$
-
+La función *sl(p)* calcula la solución asociada a un vértice conocidas las soluciones parciales de los mismos.
+```math
+sl(p) = \begin{cases} sb(p) & b(p) \\
+ \underset{h \in nx(p,a(f(p)))}{\large CS} \ sl(h) & \neg b(p) 
+ \end{cases} $$
+```
 ## Propiedades de los operadores
 
   
