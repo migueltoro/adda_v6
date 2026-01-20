@@ -49,16 +49,19 @@ la función *f(p)* calcula la solución parcial asociada a un vértice
 ```math 
 f(p) = \begin{cases} sbp(p) & b(p) \\
  \underset{a \in A_p}{\large M} \ g(p,a) & \neg b(p)
- \end{cases} $$
+ \end{cases}
 ```
 La función *g(p)* calcula la solución parcial asociada a un vértice si tomamos la alternativa *a*
-$$ g(p,a) = \underset{h \in nx(p,a)}{\large CBS} \ f(h) $$
+```math
+g(p,a) = \underset{h \in nx(p,a)}{\large CBS} \ f(h)
+```
 
 La función *sl(p)* calcula la solución asociada a un vértice conocidas las soluciones parciales de los mismos.
+
 ```math
 sl(p) = \begin{cases} sb(p) & b(p) \\
  \underset{h \in nx(p,a(f(p)))}{\large CS} \ sl(h) & \neg b(p) 
- \end{cases} $$
+ \end{cases}
 ```
 ## Propiedades de los operadores
 
