@@ -50,10 +50,10 @@ public class TestFloyd {
 		
 		System.out.println(tree.vertices());
 		
-		a.toDot("ficheros/floydPD.gv",
-				v->String.format("(%d,%d,%d)",v.i(),v.j(),v.k()),
-				e->e.action()?"Y":"N",
-				tree.vertices());
+//		a.toDot("ficheros/floydPD.gv",
+//				v->String.format("(%d,%d,%d)",v.i(),v.j(),v.k()),
+//				e->e.action()?"Y":"N",
+//				tree.vertices());
 	}
 
 }
