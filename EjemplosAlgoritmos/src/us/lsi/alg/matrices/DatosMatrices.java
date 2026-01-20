@@ -5,14 +5,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import us.lsi.common.Files2;
-import us.lsi.hypergraphsD.Data;
 
 public class DatosMatrices {
 	
 	public static List<MatrixInf> matrices;
 	public static Integer n;
 	
-	public static void leeFichero(String fichero, Data.DpType type){
+	public static void leeFichero(String fichero){
 		List<Integer> ls = Files2.streamFromFile(fichero)
 				.map(ln->Integer.parseInt(ln))
 				.collect(Collectors.toList());	
@@ -23,8 +22,6 @@ public class DatosMatrices {
 		}
 		DatosMatrices.matrices = r;
 		DatosMatrices.n = matrices.size();
-		System.out.println(" n = "+n);
-		Data.type = type;
 	}
 
 	public static Integer nf(Integer i) {

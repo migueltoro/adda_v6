@@ -6,13 +6,12 @@ import us.lsi.graphs.alg.PD;
 import us.lsi.graphs.alg.PD.PDType;
 import us.lsi.hypergraphs.GraphTree;
 import us.lsi.hypergraphs.SimpleVirtualHyperGraph;
-import us.lsi.hypergraphsD.Data;
 
 public class TestMatricesPD {
 
 	public static void main(String[] args) {
 		Locale.setDefault(Locale.of("en", "US"));
-		DatosMatrices.leeFichero("ficheros/matrices/matrices.txt",Data.DpType.Min);
+		DatosMatrices.leeFichero("ficheros/matrices/matrices.txt");
 		
 		MatrixVertex initial = MatrixVertex.initial();
 		

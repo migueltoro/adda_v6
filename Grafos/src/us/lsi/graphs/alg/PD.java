@@ -27,7 +27,7 @@ public class PD<V extends VirtualHyperVertex<V,E,A,S>,
 
 	public enum PDType{Min,Max}
 
-	public SimpleVirtualHyperGraph<V,E, A> graph;
+	public SimpleVirtualHyperGraph<V,E,A> graph;
 	private Comparator<Sp<A,E>> comparatorSp;
 	public Map<V,Sp<A,E>> solutionsTree;
 	private PDType type;
@@ -35,7 +35,7 @@ public class PD<V extends VirtualHyperVertex<V,E,A,S>,
 	public Graph<VertexGraph<V,E>,SimpleEdge<VertexGraph<V,E>>> outGraph;
 	public Boolean withGraph = false;
 	
-	PD(SimpleVirtualHyperGraph<V,E, A> graph, PDType type) {
+	PD(SimpleVirtualHyperGraph<V,E,A> graph, PDType type) {
 		this.graph = graph;
 		this.startVertex = graph.getStartVertex();
 		this.type = type;
@@ -80,8 +80,7 @@ public class PD<V extends VirtualHyperVertex<V,E,A,S>,
 				if(this.withGraph) this.completeGraph(actual,edge,neighbords);
 			}
 			r = sps.stream().filter(s -> s != null).min(this.comparatorSp).orElse(null);
-			this.solutionsTree.put(actual, r);
-			
+			this.solutionsTree.put(actual, r);			
 		}
 		return r;
 	}
@@ -132,13 +131,13 @@ public class PD<V extends VirtualHyperVertex<V,E,A,S>,
 		return new PD<V, E, A, S>(graph, type);
 	}
 
-	public record Sp<A,E>(A action, Double weight, E edge) implements Comparable<Sp<A,E>> {
+	public record Sp<A,E>(A action,Double weight, E edge) implements Comparable<Sp<A,E>> {
 		
 		public static <A,E> Sp<A,E> of(A action, Double weight,E edge) {
 			return new Sp<>(action,weight,edge);
 		}
 		
-		public static <A,E> Sp<A,E> of(Double weight) {
+		public static <A,W extends Comparable<W>,E> Sp<A,E> of(Double weight) {
 			return new Sp<>(null,weight,null);
 		}
 		

@@ -68,6 +68,8 @@ public record MatrixVertex(Integer i,Integer j)
 		return String.format("(%s * %s)",solutions.get(0),solutions.get(1));
 	}
 	
-	
+	public String toString() {
+		return String.format("(%d,%d)", i, j);
+	}
 	
 }

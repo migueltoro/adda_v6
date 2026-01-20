@@ -52,5 +52,17 @@ public sealed interface GraphTree<V extends VirtualHyperVertex<V, E, A, S>, E ex
 					.collect(Collectors.toSet()));             
 		};
 	}
+	
+	public default String toString2() {
+		return switch (this) {
+        case Gtb<V, E, A, S> tb -> String.format("(%s)", tb.vertex());
+        case Gtr<V, E, A, S> tr -> {
+            String ts = tr.targets().stream()
+                    .map(t -> t.toString())
+                    .collect(Collectors.joining(","));
+            yield String.format("(%s --%s--> %s)", tr.vertex(), tr.action(), ts);
+        }
+        };
+	}
 
 }
