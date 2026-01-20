@@ -154,10 +154,10 @@ Las soluciones parciales de los problemas en PD vienen definidas por `GraphTree<
 ```java
 sealed interface GraphTree<V,E,A,W,S> permits Gtb, Gtr {
 	static <V,E,A,W,S> GraphTree<V,E,A,S> tb(V v) { ... }
-	static <V,E,W,S> GraphTree<V,E,A,S> tr(V v, A a, List<GraphTree<V, E, A, S>> targets) { ... }
+	static <V,E,W,S> GraphTree<V,E,A,S> tr(V v, List<GraphTree<V, E, A, S>> targets) { ... }
 }
 record Gtb<V ,E, A, S>(V vertex) implements GraphTree<V, E, A, S> { ... }
-record Gtr<V, E, A, S>(V vertex, A action, List<GraphTree<V, E, A, S>> targets) implements GraphTree<V, E, A, S> { ... }
+record Gtr<V, E, A, S>(V vertex,List<GraphTree<V, E, A, S>> targets) implements GraphTree<V, E, A, S> { ... }
 ```
 
 Del `GraphTree` podemos deducir su solución asociada, sus vértices, su peso, etc.

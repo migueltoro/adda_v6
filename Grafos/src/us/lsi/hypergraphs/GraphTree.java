@@ -12,13 +12,13 @@ public sealed interface GraphTree<V extends VirtualHyperVertex<V, E, A, S>, E ex
 	permits Gtb, Gtr {
 
 	public static <V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S> 
-		GraphTree<V, E, A, S> tb(V v, Double weight) {
+		GraphTree<V, E, A, S> tb(V v) {
 		return new Gtb<V, E, A, S>(v);
 	}
 
 	public static <V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S> 
-		GraphTree<V, E, A, S> tr(V v, A a, List<GraphTree<V, E, A, S>> targets) {
-		return new Gtr<V, E, A, S>(v, a, targets);
+		GraphTree<V, E, A, S> tr(V v,List<GraphTree<V, E, A, S>> targets) {
+		return new Gtr<V, E, A, S>(v, targets);
 	}
 
 	public static <V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S> 
@@ -26,9 +26,9 @@ public sealed interface GraphTree<V extends VirtualHyperVertex<V, E, A, S>, E ex
 		GraphTree<V, E, A, S> r = null;
 		Sp<A, E> sp = tree.get(vertex);
 		if (vertex.isBaseCase()) {
-			r = tb(vertex, sp.weight());
+			r = tb(vertex);
 		} else {
-			r = tr(vertex, sp.action(), vertex.edge(sp.action()).targets().stream()
+			r = tr(vertex, sp.edge().targets().stream()
 					.map(vt -> graphTree(vt, tree))
 					.collect(Collectors.toList()));
 		}
@@ -60,7 +60,7 @@ public sealed interface GraphTree<V extends VirtualHyperVertex<V, E, A, S>, E ex
             String ts = tr.targets().stream()
                     .map(t -> t.toString())
                     .collect(Collectors.joining(","));
-            yield String.format("(%s --%s--> %s)", tr.vertex(), tr.action(), ts);
+            yield String.format("(%s --> %s)", tr.vertex(), ts);
         }
         };
 	}
