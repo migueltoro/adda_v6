@@ -46,7 +46,7 @@ public class MatricesPDBU {
 					if (w != null) r = Sp.of(w);
 					memory.put(actual, r);
 				} else {
-					r = Common.vertexSp(actual, memory);
+					r = Common.vertexSpFBU(actual, memory);
 					memory.put(actual, r);
 				}
 			}
@@ -60,8 +60,6 @@ public class MatricesPDBU {
 		DatosMatrices.leeFichero("ficheros/matrices/matrices.txt");
 		
 		MatrixVertex start = MatrixVertex.of(0,DatosMatrices.n);
-		
-		Common.type = Common.Type.BottomUp;
 		
 		Map<MatrixVertex, Sp<Integer, MatrixEdge>> r = MatricesPDBU.search();
 		

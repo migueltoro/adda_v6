@@ -40,6 +40,30 @@ public class Common {
 		return r;
 	}
 	
+	public static Sp<Boolean,FloydEdge> edgeSpBU(FloydVertex actual, Boolean a, Map<FloydVertex, Sp<Boolean,FloydEdge>> memory) {
+		List<FloydVertex> neighbors = actual.neighbors(a);
+		Integer nbn = neighbors.size();
+		List<Double> nbWeights = new ArrayList<>();
+		for (FloydVertex v : neighbors) {
+			Sp<Boolean,FloydEdge> sp = memory.get(v);
+			if (sp == null) break;
+			nbWeights.add(sp.weight().doubleValue());
+		}
+		return nbWeights.size() == nbn ? 
+				Sp.of(a,actual.edge(a).weight(nbWeights),actual.edge(a)): null;
+
+	}
+	
+	public static Sp<Boolean,FloydEdge> vertexSpBU(FloydVertex actual,Map<FloydVertex, Sp<Boolean,FloydEdge>> memory) {
+		List<Sp<Boolean,FloydEdge>> sps = new ArrayList<>();			
+		for (Boolean a : actual.actions()) {
+			Sp<Boolean,FloydEdge> spa = edgeSp(actual,a, memory);
+			sps.add(spa);
+		}
+		Sp<Boolean,FloydEdge> r = sps.stream().filter(s -> s != null).min(Comparator.naturalOrder()).orElse(null);
+		return r;
+	}
+	
 	public static Sp<Boolean,FloydEdge> edgeSpF(FloydVertex actual, Boolean a, Map<FloydVertex, Sp<Boolean,FloydEdge>> memory) {
 		List<FloydVertex> neighbors = actual.neighbors(a);
 		Integer nbn = neighbors.size();
@@ -60,5 +84,27 @@ public class Common {
 				.min(Comparator.naturalOrder())
 				.orElse(null);
 	}
+	
+	public static Sp<Boolean,FloydEdge> edgeSpFBU(FloydVertex actual, Boolean a, Map<FloydVertex, Sp<Boolean,FloydEdge>> memory) {
+		List<FloydVertex> neighbors = actual.neighbors(a);
+		Integer nbn = neighbors.size();
+		List<Double> nbWeights = neighbors.stream()
+				.map(v -> memory.get(v))
+				.takeWhile(s -> s != null)
+				.map(s -> s.weight().doubleValue())
+				.toList();
+		return nbWeights.size() == nbn ? 
+				Sp.of(a,actual.edge(a).weight(nbWeights),actual.edge(a)): null;
+
+	}
+	
+	public static Sp<Boolean,FloydEdge> vertexSpFBU(FloydVertex actual,Map<FloydVertex, Sp<Boolean,FloydEdge>> memory) {
+		return actual.actions().stream()
+				.map(a -> edgeSpFBU(actual, a, memory))
+				.filter(sp -> sp != null)
+				.min(Comparator.naturalOrder())
+				.orElse(null);
+	}
+
 
 }

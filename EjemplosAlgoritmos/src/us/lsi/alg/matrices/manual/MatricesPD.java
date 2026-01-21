@@ -38,7 +38,7 @@ public class MatricesPD {
 			if (w != null) r = Sp.of(w);
 			memory.put(actual, r);
 		} else {
-			r = Common.vertexSp(actual, memory);
+			r = Common.vertexSpF(actual, memory);
 			memory.put(actual, r);
 		}
 		return r;
@@ -50,8 +50,6 @@ public class MatricesPD {
 		DatosMatrices.leeFichero("ficheros/matrices/matrices.txt");
 		
 		MatrixVertex start = MatrixVertex.of(0,DatosMatrices.n);
-		
-		Common.type = Common.Type.Recursivo;
 		
 		MatricesPD a = MatricesPD.of(start);
 		

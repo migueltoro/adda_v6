@@ -46,7 +46,7 @@ public class FloydPDBottomUp {
 						if (w != null) r = Sp.of(w);
 						memory.put(actual, r);
 					} else {
-						r = Common.vertexSpF(actual, memory);
+						r = Common.vertexSpBU(actual, memory);
 						memory.put(actual, r);
 					}
 				}
