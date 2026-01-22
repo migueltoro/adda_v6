@@ -4,23 +4,29 @@ package us.lsi.alg.matrices.manual;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
 import us.lsi.alg.matrices.DatosMatrices;
 import us.lsi.alg.matrices.MatrixEdge;
 import us.lsi.alg.matrices.MatrixVertex;
+import us.lsi.graphs.alg.PDMC;
 import us.lsi.graphs.alg.PD.Sp;
+import us.lsi.graphs.alg.PDMC.Search;
 import us.lsi.hypergraphs.GraphTree;
 
 
-public class MatricesPD {
-
+public class MatricesPD implements Search<MatrixVertex,MatrixEdge,Integer,String> {
+	
 	public static MatricesPD of(MatrixVertex startVertex) {
 		return new MatricesPD(startVertex);
 	}
 	
-	private MatrixVertex startVertex;
+	public MatrixVertex startVertex;
+	public PDMC<MatrixVertex,MatrixEdge,Integer,String> pdmc; 
+
 	
 	private MatricesPD(MatrixVertex startVertex) {
-		this.startVertex = startVertex;
+		this.pdmc = PDMC.of(this);
+		this.startVertex = startVertex;	
 	}
 	
 	public Map<MatrixVertex, Sp<Integer, MatrixEdge>> search(){
@@ -29,7 +35,7 @@ public class MatricesPD {
 		return memory;
 	}
 
-	public static Sp<Integer, MatrixEdge> search(MatrixVertex actual, Map<MatrixVertex, Sp<Integer, MatrixEdge>> memory) {
+	public Sp<Integer, MatrixEdge> search(MatrixVertex actual, Map<MatrixVertex, Sp<Integer, MatrixEdge>> memory) {
 		Sp<Integer,MatrixEdge> r = null;
 		if (memory.containsKey(actual)) {
 			r = memory.get(actual);
@@ -38,7 +44,7 @@ public class MatricesPD {
 			if (w != null) r = Sp.of(w);
 			memory.put(actual, r);
 		} else {
-			r = Common.vertexSpF(actual, memory);
+			r = this.pdmc.vertexSpF(actual, memory);
 			memory.put(actual, r);
 		}
 		return r;
@@ -60,6 +66,5 @@ public class MatricesPD {
 					
 		System.out.println(tree.solution());
 	}
-
 	
 }

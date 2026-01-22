@@ -14,28 +14,32 @@ import us.lsi.alg.floyd.FloydEdge;
 import us.lsi.alg.floyd.FloydVertex;
 import us.lsi.graphs.SimpleEdge;
 import us.lsi.graphs.alg.PD.Sp;
+import us.lsi.graphs.alg.PDMC;
+import us.lsi.graphs.alg.PDMC.Search;
 import us.lsi.hypergraphs.GraphTree;
 
 
-public class FloydPD {
+public class FloydPD implements Search<FloydVertex,FloydEdge,Boolean,GraphPath<Integer,SimpleEdge<Integer>>>{
 	
-	public static FloydVertex startVertex;
+	public FloydVertex startVertex;
+	public PDMC<FloydVertex,FloydEdge,Boolean,GraphPath<Integer,SimpleEdge<Integer>>> pdmc; 
 	
 	public static FloydPD of(FloydVertex startVertex) {
 		return new FloydPD(startVertex);
 	}
 	
 	private FloydPD(FloydVertex startVertex) {
-		FloydPD.startVertex = startVertex;
+		this.pdmc = PDMC.of(this);
+		this.startVertex = startVertex;	
 	}
 	
-	public static Map<FloydVertex,Sp<Boolean,FloydEdge>> search(){
+	public Map<FloydVertex,Sp<Boolean,FloydEdge>> search(){
 		Map<FloydVertex,Sp<Boolean,FloydEdge>> memory = new HashMap<>();
-		search(FloydPD.startVertex,memory);
+		search(this.startVertex,memory);
 		return memory;
 	}
 
-	public static Sp<Boolean,FloydEdge> search(FloydVertex actual, Map<FloydVertex, Sp<Boolean,FloydEdge>> memory) {
+	public Sp<Boolean,FloydEdge> search(FloydVertex actual, Map<FloydVertex, Sp<Boolean,FloydEdge>> memory) {
 		Sp<Boolean,FloydEdge> r = null;
 		if (memory.containsKey(actual)) {
 			r = memory.get(actual);
@@ -44,7 +48,7 @@ public class FloydPD {
 			if (w != null) r = Sp.of(w);
 			memory.put(actual, r);
 		} else {
-			r = Common.vertexSpF(actual, memory);
+			r = this.pdmc.vertexSp(actual, memory);
 			memory.put(actual, r);
 		}
 		return r;
@@ -66,9 +70,9 @@ public class FloydPD {
 		
 		FloydVertex start = FloydVertex.initial(origen,destino);
 		
-		FloydPD.of(start);
+		FloydPD a =FloydPD.of(start);
 		
-		Map<FloydVertex, Sp<Boolean,FloydEdge>> r = search();
+		Map<FloydVertex, Sp<Boolean,FloydEdge>> r = a.search();
 		
 		GraphTree<FloydVertex,FloydEdge,Boolean,GraphPath<Integer,SimpleEdge<Integer>>> tree = 
 				GraphTree.graphTree(start,r);

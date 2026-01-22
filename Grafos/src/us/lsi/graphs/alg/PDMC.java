@@ -9,24 +9,32 @@ import us.lsi.graphs.alg.PD.Sp;
 import us.lsi.hypergraphs.SimpleHyperEdge;
 import us.lsi.hypergraphs.VirtualHyperVertex;
 
-public class PDManualCommon {
+/**
+ * Clase que aglutina elementos comunes a las implementaciones manuales de Programación Dinámica.
+
+ */
+public class PDMC<V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S>{
+	
+	public static <V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S> PDMC<V, E, A, S> of(
+			Search<V, E, A, S> search) {
+		return new PDMC<V, E, A, S>(search);
+	}
+	
+	private Search<V, E, A, S> search;
+	
+	private PDMC(Search<V, E, A, S> search) {
+		this.search = search;
+	}
 
 	public static interface Search<V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S> {
 		Sp<A, E> search(V actual, Map<V, Sp<A, E>> memory);
 	}
-	
-	public static PDManualCommon.Search<?,?,?,?> fSearch;
 
-	public static <V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S>
-		Sp<A, E> search(V actual, Map<V, Sp<A, E>> memory) {
-	    @SuppressWarnings("unchecked")
-	    Search<V, E, A, S> searchImpl = (Search<V, E, A, S>) fSearch;
-	    return searchImpl.search(actual, memory);
+	public Sp<A, E> search(V actual, Map<V, Sp<A, E>> memory) {
+	    return search.search(actual, memory);
 	}
 
-	public static <V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S> 
-		Sp<A, E> edgeSp(V actual, A a, Map<V, Sp<A, E>> memory) {
-		
+	public Sp<A, E> edgeSp(V actual, A a, Map<V, Sp<A, E>> memory) {		
 		List<V> neighbors = actual.neighbors(a);
 		Integer nbn = neighbors.size();
 		List<Double> nbWeights = new ArrayList<>();
@@ -40,8 +48,7 @@ public class PDManualCommon {
 
 	}
 
-	public static <V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S> 
-		Sp<A, E> vertexSp(V actual, Map<V, Sp<A, E>> memory) {
+	public Sp<A, E> vertexSp(V actual, Map<V, Sp<A, E>> memory) {
 		
 		List<Sp<A, E>> sps = new ArrayList<>();
 		for (A a : actual.actions()) {
@@ -52,8 +59,7 @@ public class PDManualCommon {
 		return r;
 	}
 
-	public static <V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S> 
-		Sp<A, E> edgeSpBU(V actual, A a, Map<V, Sp<A, E>> memory) {
+	public Sp<A, E> edgeSpBU(V actual, A a, Map<V, Sp<A, E>> memory) {
 		
 		List<V> neighbors = actual.neighbors(a);
 		Integer nbn = neighbors.size();
@@ -68,8 +74,7 @@ public class PDManualCommon {
 
 	}
 
-	public static <V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S> 
-		Sp<A, E> vertexSpBU(V actual, Map<V, Sp<A, E>> memory) {
+	public Sp<A, E> vertexSpBU(V actual, Map<V, Sp<A, E>> memory) {
 		
 		List<Sp<A, E>> sps = new ArrayList<>();
 		for (A a : actual.actions()) {
@@ -80,8 +85,7 @@ public class PDManualCommon {
 		return r;
 	}
 
-	public static <V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S> 
-		Sp<A, E> edgeSpF(V actual, A a, Map<V, Sp<A, E>> memory) {
+	public Sp<A, E> edgeSpF(V actual, A a, Map<V, Sp<A, E>> memory) {
 		
 		List<V> neighbors = actual.neighbors(a);
 		Integer nbn = neighbors.size();
@@ -93,8 +97,7 @@ public class PDManualCommon {
 
 	}
 
-	public static <V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S> 
-		Sp<A, E> vertexSpF(V actual, Map<V, Sp<A, E>> memory) {
+	public Sp<A, E> vertexSpF(V actual, Map<V, Sp<A, E>> memory) {
 		
 		return actual.actions().stream()
 				.map(a -> edgeSpF(actual, a, memory))
@@ -103,8 +106,7 @@ public class PDManualCommon {
 				.orElse(null);
 	}
 
-	public static <V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S> 
-		Sp<A, E> edgeSpFBU(V actual, A a, Map<V, Sp<A, E>> memory) {
+	public Sp<A, E> edgeSpFBU(V actual, A a, Map<V, Sp<A, E>> memory) {
 		
 		List<V> neighbors = actual.neighbors(a);
 		Integer nbn = neighbors.size();
@@ -116,8 +118,7 @@ public class PDManualCommon {
 
 	}
 
-	public static <V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S> 
-		Sp<A, E> vertexSpFBU(V actual, Map<V, Sp<A, E>> memory) {
+	public Sp<A, E> vertexSpFBU(V actual, Map<V, Sp<A, E>> memory) {
 		
 		return actual.actions().stream()
 				.map(a -> edgeSpFBU(actual, a, memory))
@@ -125,5 +126,7 @@ public class PDManualCommon {
 				.min(Comparator.naturalOrder())
 				.orElse(null);
 	}
+
+	
 
 }
