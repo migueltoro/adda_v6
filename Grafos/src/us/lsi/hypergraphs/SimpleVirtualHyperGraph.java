@@ -58,7 +58,7 @@ public class SimpleVirtualHyperGraph<V extends VirtualHyperVertex<V,E,A,?>, E ex
 		return e.targets();
 	}
 
-	public double getEdgeWeight(E e, List<Double> weights) {
+	public Double getEdgeWeight(E e, List<Double> weights) {
 		return e.weight(weights);
 	}
 	

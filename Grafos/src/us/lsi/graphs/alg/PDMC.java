@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import us.lsi.graphs.alg.PD.PDType;
 import us.lsi.graphs.alg.PD.Sp;
 import us.lsi.hypergraphs.SimpleHyperEdge;
 import us.lsi.hypergraphs.VirtualHyperVertex;
@@ -16,14 +17,21 @@ import us.lsi.hypergraphs.VirtualHyperVertex;
 public class PDMC<V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S>{
 	
 	public static <V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S> PDMC<V, E, A, S> of(
-			Search<V, E, A, S> search) {
-		return new PDMC<V, E, A, S>(search);
+			Search<V, E, A, S> search,PDType type) {
+		return new PDMC<V, E, A, S>(search,type);
 	}
 	
 	private Search<V, E, A, S> search;
+	private Comparator<Sp<A, E>> comparator = null;
 	
-	private PDMC(Search<V, E, A, S> search) {
+	
+	private PDMC(Search<V, E, A, S> search,PDType type) {
 		this.search = search;
+		if (type == PDType.Min) {
+			this.comparator = Comparator.reverseOrder();
+		} else {
+			this.comparator = Comparator.naturalOrder();
+		}
 	}
 
 	public static interface Search<V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHyperEdge<V, E, A>, A, S> {
@@ -40,8 +48,7 @@ public class PDMC<V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHype
 		List<Double> nbWeights = new ArrayList<>();
 		for (V v : neighbors) {
 			Sp<A, E> s = search(v, memory);
-			if (s == null)
-				break;
+			if (s == null) break;
 			nbWeights.add(s.weight().doubleValue());
 		}
 		return nbWeights.size() == nbn ? Sp.of(a, actual.edge(a).weight(nbWeights), actual.edge(a)) : null;
@@ -55,7 +62,7 @@ public class PDMC<V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHype
 			Sp<A, E> spa = edgeSp(actual, a, memory);
 			sps.add(spa);
 		}
-		Sp<A, E> r = sps.stream().filter(s -> s != null).min(Comparator.naturalOrder()).orElse(null);
+		Sp<A, E> r = sps.stream().filter(s -> s != null).max(this.comparator).orElse(null);
 		return r;
 	}
 
@@ -66,8 +73,7 @@ public class PDMC<V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHype
 		List<Double> nbWeights = new ArrayList<>();
 		for (V v : neighbors) {
 			Sp<A, E> s = memory.get(v);
-			if (s == null)
-				break;
+			if (s == null)break;
 			nbWeights.add(s.weight().doubleValue());
 		}
 		return nbWeights.size() == nbn ? Sp.of(a, actual.edge(a).weight(nbWeights), actual.edge(a)) : null;
@@ -81,7 +87,7 @@ public class PDMC<V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHype
 			Sp<A, E> spa = edgeSpBU(actual, a, memory);
 			sps.add(spa);
 		}
-		Sp<A, E> r = sps.stream().filter(s -> s != null).min(Comparator.naturalOrder()).orElse(null);
+		Sp<A, E> r = sps.stream().filter(s -> s != null).max(this.comparator).orElse(null);
 		return r;
 	}
 
@@ -102,7 +108,7 @@ public class PDMC<V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHype
 		return actual.actions().stream()
 				.map(a -> edgeSpF(actual, a, memory))
 				.filter(sp -> sp != null)
-				.min(Comparator.naturalOrder())
+				.max(this.comparator)
 				.orElse(null);
 	}
 
@@ -123,7 +129,7 @@ public class PDMC<V extends VirtualHyperVertex<V, E, A, S>, E extends SimpleHype
 		return actual.actions().stream()
 				.map(a -> edgeSpFBU(actual, a, memory))
 				.filter(sp -> sp != null)
-				.min(Comparator.naturalOrder())
+				.max(this.comparator)
 				.orElse(null);
 	}
 

@@ -14,7 +14,7 @@ public interface VirtualHyperVertex<V,E,A,S> {
 	
 	S baseCaseSolution();
 
-	S solution(List<S> solutions);
+	S solution(A a, List<S> solutions);
 	
 	/**
 	 * @param a Una acci&oacute;n

@@ -11,6 +11,7 @@ import us.lsi.alg.matrices.DatosMatrices;
 import us.lsi.alg.matrices.MatrixEdge;
 import us.lsi.alg.matrices.MatrixVertex;
 import us.lsi.graphs.alg.PDMC;
+import us.lsi.graphs.alg.PD.PDType;
 import us.lsi.graphs.alg.PD.Sp;
 import us.lsi.graphs.alg.PDMC.Search;
 import us.lsi.hypergraphs.GraphTree;
@@ -26,7 +27,7 @@ public class MatricesPDBU implements Search<MatrixVertex,MatrixEdge,Integer,Stri
 	}
 	
 	private MatricesPDBU(MatrixVertex startVertex) {
-		this.pdmc = PDMC.of(this);
+		this.pdmc = PDMC.of(this,PDType.Min);
 		this.startVertex = startVertex;	
 	}
 	

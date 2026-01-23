@@ -15,7 +15,6 @@ import org.jgrapht.nio.DefaultAttribute;
 
 import us.lsi.colors.GraphColors;
 import us.lsi.graphs.SimpleEdge;
-import us.lsi.hypergraphs.GraphTree;
 import us.lsi.hypergraphs.SimpleHyperEdge;
 import us.lsi.hypergraphs.SimpleVirtualHyperGraph;
 import us.lsi.hypergraphs.VirtualHyperVertex;
@@ -50,6 +49,7 @@ public class PD<V extends VirtualHyperVertex<V,E,A,S>,
 	}
 
 	public Sp<A,E> search(V actual) {
+
 		Sp<A,E> r = null;
 		if (this.solutionsTree.containsKey(actual)) {
 			r = this.solutionsTree.get(actual);
@@ -116,12 +116,9 @@ public class PD<V extends VirtualHyperVertex<V,E,A,S>,
 	public Map<V, Sp<A,E>> getSolutionsTree() {
 		return solutionsTree;
 	}	
+	
 	public PDType getType() {
 		return type;
-	}
-	
-	public GraphTree<V,E,A,S> searchTree(V vertex){
-		return GraphTree.graphTree(vertex, solutionsTree);
 	}
 	
 	public static <V extends VirtualHyperVertex<V, E, A,S>, E extends SimpleHyperEdge<V, E, A>, A, S> 

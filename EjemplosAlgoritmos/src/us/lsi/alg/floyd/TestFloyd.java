@@ -3,12 +3,14 @@ package us.lsi.alg.floyd;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.jgrapht.GraphPath;
 import us.lsi.grafos.datos.Ciudad;
 import us.lsi.graphs.SimpleEdge;
 import us.lsi.graphs.alg.PD;
 import us.lsi.graphs.alg.PD.PDType;
+import us.lsi.graphs.alg.PD.Sp;
 import us.lsi.hypergraphs.GraphTree;
 import us.lsi.hypergraphs.SimpleVirtualHyperGraph;
 
@@ -39,7 +41,10 @@ public class TestFloyd {
 		a.withGraph = true;
 		a.search();
 		
-		GraphTree<FloydVertex,FloydEdge,Boolean,GraphPath<Integer,SimpleEdge<Integer>>> tree = a.searchTree(p);
+		Map<FloydVertex, Sp<Boolean, FloydEdge>> s = a.getSolutionsTree();
+		
+		GraphTree<FloydVertex,FloydEdge,Boolean,GraphPath<Integer,SimpleEdge<Integer>>> tree = 
+				GraphTree.graphTree(p,s);
 //		System.out.println(FloydVertex.solution(tree).getVertexList().stream().collect(Collectors.toList()));
 //		System.out.println(tree);
 		List<Ciudad> lc = tree.solution().getVertexList().stream()

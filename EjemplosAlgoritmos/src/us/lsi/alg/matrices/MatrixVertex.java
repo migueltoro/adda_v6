@@ -64,7 +64,7 @@ public record MatrixVertex(Integer i,Integer j)
 	}
 
 	@Override
-	public String solution(List<String> solutions) {
+	public String solution(Integer a, List<String> solutions) {
 		return String.format("(%s * %s)",solutions.get(0),solutions.get(1));
 	}
 	

@@ -1,9 +1,16 @@
 package us.lsi.alg.matrices;
 
 import java.util.Locale;
+import java.util.Map;
 
+import org.jgrapht.GraphPath;
+
+import us.lsi.alg.floyd.FloydEdge;
+import us.lsi.alg.floyd.FloydVertex;
+import us.lsi.graphs.SimpleEdge;
 import us.lsi.graphs.alg.PD;
 import us.lsi.graphs.alg.PD.PDType;
+import us.lsi.graphs.alg.PD.Sp;
 import us.lsi.hypergraphs.GraphTree;
 import us.lsi.hypergraphs.SimpleVirtualHyperGraph;
 
@@ -25,7 +32,11 @@ public class TestMatricesPD {
 		a.withGraph = true;
 		a.search();
 		
-		GraphTree<MatrixVertex,MatrixEdge,Integer,String> tree = a.searchTree(initial);
+		Map<MatrixVertex, Sp<Integer, MatrixEdge>> s = a.getSolutionsTree();
+		
+		GraphTree<MatrixVertex,MatrixEdge,Integer,String> tree = 
+				GraphTree.graphTree(initial,s);
+	
 		
 		System.out.println(tree.solution());
 		

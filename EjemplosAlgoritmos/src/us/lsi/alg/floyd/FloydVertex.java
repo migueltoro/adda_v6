@@ -88,7 +88,7 @@ public record FloydVertex(Integer i,Integer j,Integer k)
 	}
 
 	@Override
-	public GraphPath<Integer,SimpleEdge<Integer>> solution(List<GraphPath<Integer,SimpleEdge<Integer>>> solutions) {
+	public GraphPath<Integer,SimpleEdge<Integer>> solution(Boolean a, List<GraphPath<Integer,SimpleEdge<Integer>>> solutions) {
 		if(solutions.size()==1){
 			return solutions.get(0);
 		} else {
@@ -106,4 +106,6 @@ public record FloydVertex(Integer i,Integer j,Integer k)
 		return new GraphWalk<Integer, SimpleEdge<Integer>>(gp1.getGraph(),vertices, 
 				gp1.getWeight() + gp2.getWeight());
 	}
+	
+	
 }

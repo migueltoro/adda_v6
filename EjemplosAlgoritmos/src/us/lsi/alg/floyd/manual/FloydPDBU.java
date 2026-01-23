@@ -11,6 +11,7 @@ import us.lsi.alg.floyd.FloydEdge;
 import us.lsi.alg.floyd.FloydVertex;
 import us.lsi.graphs.SimpleEdge;
 import us.lsi.graphs.alg.PDMC;
+import us.lsi.graphs.alg.PD.PDType;
 import us.lsi.graphs.alg.PD.Sp;
 import us.lsi.graphs.alg.PDMC.Search;
 import us.lsi.hypergraphs.GraphTree;
@@ -25,7 +26,7 @@ public class FloydPDBU implements Search<FloydVertex,FloydEdge,Boolean,GraphPath
 	}
 	
 	private FloydPDBU(FloydVertex startVertex) {
-		this.pdmc = PDMC.of(this);
+		this.pdmc = PDMC.of(this,PDType.Min);
 		this.startVertex = startVertex;	
 	}
 	
