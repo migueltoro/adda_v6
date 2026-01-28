@@ -77,7 +77,9 @@ public class VertexEdgeCoverPLI {
 		if (solution.isPresent()) {
 			System.out.println(solution.get().toString((s, d) -> d > 0.));
 			Set<Carretera> carreteras = solution.get().values.keySet().stream()
-					.filter(s -> solution.get().values.get(s) > 0).map(s -> carretera(s)).collect(Collectors.toSet());
+					.filter(s -> solution.get().values.get(s) > 0)
+					.map(s -> carretera(s))
+					.collect(Collectors.toSet());
 			GraphColors.toDot(graph, "ficheros/edge_cover.gv", v -> v.nombre(), e -> e.nombre(),
 					v -> GraphColors.color(Color.black),
 					e -> GraphColors.colorIf(Color.red, Color.black, carreteras.contains(e)));
@@ -88,7 +90,7 @@ public class VertexEdgeCoverPLI {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		vertex_cover_model();
+		edge_cover_model();
 	}
 
 }

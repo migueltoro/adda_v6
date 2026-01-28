@@ -465,7 +465,8 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	@Override public Object visitSumGenerateExp(PLIModelParser.SumGenerateExpContext ctx) { 
 		List<String> ls = AuxGrammar.asListString(visit(ctx.list()));
 		String r1 = ls.stream().collect(Collectors.joining(" + "));		
-		if(ls.size()==0) r1 = "0";
+//		if(ls.size()==0) r1 = "0";
+		if(ls.size()==0) r1 = " ";
 		Integer n = ctx.s_factor().size();
 		String r2 =  IntStream.range(0,n).boxed()
 				.map(i->AuxGrammar.asString(visit(ctx.s_factor(i))))
@@ -692,14 +693,16 @@ public class PLIModelVisitorC extends PLIModelBaseVisitor<Object>{
 	
 	@Override public Object visitPlusSum(PLIModelParser.PlusSumContext ctx) { 
 		List<String> ls = AuxGrammar.asListString(visit(ctx.list()));
-		if(ls.size() == 0) return " + 0";
+//		if(ls.size() == 0) return " + 0";
+		if(ls.size() == 0) return "";
 		String r = ls.stream().collect(Collectors.joining(" + "));
 		return String.format(" + %s",r);
 	}
 	
 	@Override public Object visitMinusSum(PLIModelParser.MinusSumContext ctx) { 
 		List<String> ls = AuxGrammar.asListString(visit(ctx.list()));
-		if(ls.size() == 0) return " - 0";
+//		if(ls.size() == 0) return " - 0";
+		if(ls.size() == 0) return "";
 		String r = ls.stream().collect(Collectors.joining(" - "));
 		return String.format(" - %s",r);
 	}

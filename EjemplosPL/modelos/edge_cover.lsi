@@ -15,4 +15,4 @@ sum(x[i,j], j in 0 .. n | j > i && containsEdge(i,j)) + sum(x[j,i], j in 0 .. n 
 
 bin
 
-x[i,j], i in 0 .. n, j in 0 .. n | j > i && containsEdge(i,j))
+x[i,j], i in 0 .. n, j in 0 .. n | j > i && containsEdge(i,j)
