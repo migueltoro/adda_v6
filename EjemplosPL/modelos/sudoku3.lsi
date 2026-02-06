@@ -1,7 +1,6 @@
 head section
 
 Integer size()
-Boolean fi(Integer f, Integer c, Integer t)
 Boolean isFixed(Integer f, Integer c, Integer v)
 Integer n = size()
 
