@@ -32,10 +32,10 @@ public class Sudoku2PLI {
 				.collect(Collectors.toList());
 		return ls;
 	}
-//
-//	public static Boolean fi(Integer f, Integer c, Integer t) {
-//		return t == c/DatosSudoku2.nct + DatosSudoku2.nft*(f/DatosSudoku2.nft);
-//	}
+
+	public static Boolean fi(Integer f, Integer c, Integer t) {
+		return t == c/DatosSudoku2.nct + DatosSudoku2.nft*(f/DatosSudoku2.nft);
+	}
 	
 	public static Boolean isFixed(Integer f, Integer c, Integer v) {
 		Casilla casilla = Casilla.of(f, c);
