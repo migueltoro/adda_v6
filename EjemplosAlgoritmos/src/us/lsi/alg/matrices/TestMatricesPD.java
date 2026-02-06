@@ -3,11 +3,7 @@ package us.lsi.alg.matrices;
 import java.util.Locale;
 import java.util.Map;
 
-import org.jgrapht.GraphPath;
 
-import us.lsi.alg.floyd.FloydEdge;
-import us.lsi.alg.floyd.FloydVertex;
-import us.lsi.graphs.SimpleEdge;
 import us.lsi.graphs.alg.PD;
 import us.lsi.graphs.alg.PD.PDType;
 import us.lsi.graphs.alg.PD.Sp;

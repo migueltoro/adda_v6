@@ -1,3 +1,6 @@
+#SIZES (num rows of table, num rows of subtables)
+9,3
+#FIXED (fixed cells)
 0,1,6
 0,2,3
 0,4,8
